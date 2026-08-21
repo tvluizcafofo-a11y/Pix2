@@ -226,9 +226,10 @@
     <script>
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
-        let autenticado = false;
 
         // ---------- GERENCIAMENTO DE SENHA ----------
+        // NOTA: Não mantém estado de autenticação. Sempre pede senha ao acessar o gerenciamento.
+
         function abrirGerenciar() {
             const senhaSalva = localStorage.getItem('pixSenha');
             if (!senhaSalva) {
@@ -237,11 +238,8 @@
                 $('novaSenha').value = '';
                 $('confirmaSenha').value = '';
                 document.getElementById('erroCriar').classList.remove('visible');
-            } else if (autenticado) {
-                // Já autenticado nesta sessão
-                abrirModalGerenciar();
             } else {
-                // Pedir senha
+                // Pedir senha (sempre)
                 $('modalEntrarSenha').classList.add('active');
                 $('senhaAcesso').value = '';
                 document.getElementById('erroEntrar').classList.remove('visible');
@@ -256,8 +254,8 @@
                 return;
             }
             localStorage.setItem('pixSenha', senha);
-            autenticado = true;
             fecharModalCriarSenha();
+            // Após criar, já abre o gerenciamento diretamente (sem pedir novamente)
             abrirModalGerenciar();
         }
 
@@ -265,7 +263,6 @@
             const senha = $('senhaAcesso').value.trim();
             const senhaSalva = localStorage.getItem('pixSenha');
             if (senha === senhaSalva) {
-                autenticado = true;
                 fecharModalEntrarSenha();
                 abrirModalGerenciar();
             } else {
@@ -447,7 +444,7 @@
 
         function fecharModalGerenciar() {
             $('modalGerenciar').classList.remove('active');
-            // Mantém autenticado para a sessão
+            // Não mantém autenticação – ao reabrir, pedirá senha novamente.
         }
 
         function renderizarListaChaves(config) {
@@ -588,6 +585,7 @@
             $('geralStatus').textContent = '✓ Configurações salvas!';
             $('geralStatus').style.color = '#0b6b3a';
             setTimeout(() => { $('geralStatus').textContent = ''; }, 3000);
+            // Não fecha o modal automaticamente – o usuário fecha manualmente.
         }
 
         function atualizarCabecalho(titulo) {
