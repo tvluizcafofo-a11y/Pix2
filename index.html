@@ -11,439 +11,96 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* ===== ESTILOS (tema claro fixo) ===== */
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f5f7;
-            color: #17202a;
-        }
-        header {
-            background: #0b6b3a;
-            color: #fff;
-            padding: 16px 16px 14px;
-            text-align: center;
-            position: relative;
-        }
-        #secretArea {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 80px;
-            height: 60px;
-            z-index: 10;
-            cursor: pointer;
-            background: transparent;
-        }
-        header h1 {
-            margin: 0 0 4px;
-            font-size: 25px;
-        }
-        header h1 i {
-            margin-right: 10px;
-        }
-        header p {
-            margin: 0;
-            opacity: .9;
-            font-size: 14px;
-        }
-        main {
-            max-width: 820px;
-            margin: 18px auto;
-            padding: 0 12px;
-        }
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 16px;
-            box-shadow: 0 3px 14px #00000012;
-        }
-        h2 {
-            margin: 0 0 15px;
-            font-size: 19px;
-            color: #17202a;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin: 12px 0 6px;
-            color: #17202a;
-        }
-        input, select, button, textarea {
-            width: 100%;
-            font: inherit;
-            border-radius: 10px;
-        }
-        input, textarea {
-            padding: 12px;
-            border: 1px solid #cbd2d9;
-            background: #fff;
-            color: #17202a;
-        }
-        input:focus, textarea:focus {
-            outline: 2px solid #0b6b3a;
-            border-color: transparent;
-        }
-        input#valor {
-            font-size: 24px;
-            padding: 16px 14px;
-            text-align: center;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border-width: 2px;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 72px;
-        }
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        button {
-            border: 0;
-            padding: 13px 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .primary {
-            background: #0b6b3a;
-            color: #fff;
-        }
-        .primary:hover {
-            background: #095a31;
-        }
-        .secondary {
-            background: #e8f2ed;
-            color: #0b6b3a;
-        }
-        .secondary:hover {
-            background: #d4e6dc;
-        }
-        .danger {
-            background: #fdeaea;
-            color: #a42020;
-        }
-        .danger:hover {
-            background: #fccccc;
-        }
-        .result {
-            text-align: center;
-            display: none;
-        }
-        #qrcode {
-            display: inline-block;
-            padding: 16px;
-            background: #fff;
-            border-radius: 16px;
-            border: 4px solid #0b6b3a;
-            box-shadow: 0 4px 20px rgba(11,107,58,0.2);
-            margin: 8px auto;
-        }
-        #qrcode img, #qrcode canvas {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-        .valor {
-            font-size: 31px;
-            font-weight: bold;
-            color: #0b6b3a;
-            margin: 10px;
-        }
-        .copybox {
-            word-break: break-all;
-            background: #f4f6f8;
-            padding: 12px;
-            border-radius: 10px;
-            text-align: left;
-            font-size: 13px;
-            color: #17202a;
-        }
-        .status {
-            margin-top: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .small {
-            font-size: 12px;
-            color: #68737d;
-        }
-        .resumo {
-            background: #f7faf8;
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .resumo .info {
-            font-size: 14px;
-            color: #17202a;
-            flex: 1;
-        }
-        .resumo .info strong {
-            display: inline-block;
-            min-width: 60px;
-        }
-        .resumo .info .chave-mascarada {
-            cursor: help;
-            border-bottom: 1px dashed #68737d;
-        }
-        .resumo .btn-edit {
-            background: transparent;
-            border: 1px solid #0b6b3a;
-            color: #0b6b3a;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 0;
-            transition: all 0.3s;
-            opacity: 0.4;
-            pointer-events: none;
-            font-size: 13px;
-        }
-        .resumo .btn-edit.active {
-            opacity: 1;
-            pointer-events: auto;
-            background: #e8f2ed;
-            box-shadow: 0 0 0 2px #0b6b3a;
-        }
-        .resumo .btn-edit:hover {
-            background: #d4e6dc;
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal {
-            background: #fff;
-            max-width: 700px;
-            width: 100%;
-            border-radius: 20px;
-            padding: 24px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        .modal h2 {
-            margin-top: 0;
-            color: #17202a;
-        }
-        .modal .btn-group {
-            display: flex;
-            gap: 12px;
-        }
-        .modal .btn-group button {
-            flex: 1;
-        }
-        @media (max-width: 560px) {
-            .row {
-                grid-template-columns: 1fr;
-            }
-        }
-        #btnGerenciar {
-            display: none;
-            transition: all 0.3s;
-        }
-        #btnGerenciar.active {
-            display: block;
-            opacity: 1;
-            pointer-events: auto;
-        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f5f7; color: #17202a; }
+        header { background: #0b6b3a; color: #fff; padding: 16px 16px 14px; text-align: center; position: relative; }
+        header h1 { margin: 0 0 4px; font-size: 25px; }
+        header h1 i { margin-right: 10px; }
+        header p { margin: 0; opacity: .9; font-size: 14px; }
+        main { max-width: 820px; margin: 18px auto; padding: 0 12px; }
+        .card { background: #fff; border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 3px 14px #00000012; }
+        h2 { margin: 0 0 15px; font-size: 19px; color: #17202a; }
+        label { display: block; font-weight: bold; margin: 12px 0 6px; color: #17202a; }
+        input, select, button, textarea { width: 100%; font: inherit; border-radius: 10px; }
+        input, textarea { padding: 12px; border: 1px solid #cbd2d9; background: #fff; color: #17202a; }
+        input:focus, textarea:focus { outline: 2px solid #0b6b3a; border-color: transparent; }
+        input#valor { font-size: 24px; padding: 16px 14px; text-align: center; font-weight: bold; letter-spacing: 1px; border-width: 2px; }
+        textarea { resize: vertical; min-height: 72px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { border: 0; padding: 13px 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .primary { background: #0b6b3a; color: #fff; }
+        .primary:hover { background: #095a31; }
+        .secondary { background: #e8f2ed; color: #0b6b3a; }
+        .secondary:hover { background: #d4e6dc; }
+        .danger { background: #fdeaea; color: #a42020; }
+        .danger:hover { background: #fccccc; }
+        .result { text-align: center; display: none; }
+        #qrcode { display: inline-block; padding: 16px; background: #fff; border-radius: 16px; border: 4px solid #0b6b3a; box-shadow: 0 4px 20px rgba(11,107,58,0.2); margin: 8px auto; }
+        #qrcode img, #qrcode canvas { max-width: 100%; height: auto; display: block; }
+        .valor { font-size: 31px; font-weight: bold; color: #0b6b3a; margin: 10px; }
+        .copybox { word-break: break-all; background: #f4f6f8; padding: 12px; border-radius: 10px; text-align: left; font-size: 13px; color: #17202a; }
+        .status { margin-top: 10px; text-align: center; font-weight: bold; }
+        .small { font-size: 12px; color: #68737d; }
+        .resumo { background: #f7faf8; padding: 12px 16px; border-radius: 10px; margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+        .resumo .info { font-size: 14px; color: #17202a; flex: 1; }
+        .resumo .info strong { display: inline-block; min-width: 60px; }
+        .resumo .info .chave-mascarada { cursor: help; border-bottom: 1px dashed #68737d; }
+        .resumo .btn-edit { background: transparent; border: 1px solid #0b6b3a; color: #0b6b3a; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; margin: 0; font-size: 13px; opacity: 1; pointer-events: auto; }
+        .resumo .btn-edit:hover { background: #d4e6dc; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #fff; max-width: 700px; width: 100%; border-radius: 20px; padding: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .modal h2 { margin-top: 0; color: #17202a; }
+        .modal .btn-group { display: flex; gap: 12px; }
+        .modal .btn-group button { flex: 1; }
+        @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
 
         /* Estilos para lista de chaves */
-        .lista-chaves {
-            margin: 12px 0;
-        }
-        .item-chave {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            border-bottom: 1px solid #e8edf2;
-            background: #fafcff;
-            border-radius: 8px;
-            margin-bottom: 6px;
-        }
-        .item-chave .chave-texto {
-            font-size: 14px;
-            color: #17202a;
-            flex: 1;
-            margin: 0 10px;
-            word-break: break-all;
-        }
-        .item-chave .acoes-chave button {
-            background: transparent;
-            border: none;
-            padding: 4px 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 0 2px;
-        }
+        .lista-chaves { margin: 12px 0; }
+        .item-chave { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #e8edf2; background: #fafcff; border-radius: 8px; margin-bottom: 6px; }
+        .item-chave .chave-texto { font-size: 14px; color: #17202a; flex: 1; margin: 0 10px; word-break: break-all; }
+        .item-chave .acoes-chave button { background: transparent; border: none; padding: 4px 8px; cursor: pointer; font-size: 16px; margin: 0 2px; }
         .item-chave .acoes-chave .editar { color: #0b6b3a; }
         .item-chave .acoes-chave .excluir { color: #a42020; }
-        .item-chave .selecionar {
-            font-size: 20px;
-            cursor: pointer;
-            color: #cbd2d9;
-        }
-        .item-chave .selecionar.ativa {
-            color: #0b6b3a;
-        }
-        .chave-input-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .chave-input-group input {
-            flex: 1;
-            padding: 10px 12px;
-        }
-        .chave-input-group button {
-            margin: 0;
-            padding: 10px 18px;
-            width: auto;
-        }
-        .secao-chaves {
-            border-top: 2px solid #e8edf2;
-            padding-top: 16px;
-            margin-top: 16px;
-        }
-        .botoes-topo {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .botoes-topo button {
-            width: auto;
-            padding: 10px 20px;
-            margin: 0;
-        }
-        .btn-pequeno {
-            padding: 6px 14px;
-            font-size: 13px;
-            margin: 0;
-        }
-        .filtros {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: end;
-            margin-bottom: 16px;
-        }
-        .filtros .grupo {
-            flex: 1 1 160px;
-        }
-        .filtros .grupo label {
-            margin: 0 0 4px;
-            font-size: 13px;
-        }
-        .filtros .grupo input {
-            padding: 8px 10px;
-        }
-        .filtros .grupo button {
-            margin: 0;
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-        .item-recebimento {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            border-bottom: 1px solid #e8edf2;
-            background: #fafcff;
-            border-radius: 8px;
-            margin-bottom: 6px;
-        }
-        .item-recebimento .info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 14px;
-            color: #17202a;
-        }
-        .item-recebimento .info .data {
-            color: #68737d;
-            min-width: 100px;
-        }
-        .item-recebimento .info .valor {
-            font-weight: bold;
-            color: #0b6b3a;
-        }
-        .item-recebimento .info .descricao {
-            color: #17202a;
-        }
-        .item-recebimento .status {
-            font-size: 13px;
-            font-weight: bold;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-        .status-pendente {
-            background: #fef6e0;
-            color: #a67c00;
-        }
-        .status-pago {
-            background: #dff0d8;
-            color: #1e7e34;
-        }
-        .item-recebimento .acoes button {
-            margin: 0 0 0 8px;
-            padding: 4px 12px;
-            font-size: 13px;
-        }
-        .sem-dados {
-            text-align: center;
-            color: #68737d;
-            padding: 20px;
-        }
-        .total {
-            text-align: right;
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: 10px;
-            border-top: 2px solid #0b6b3a;
-            padding-top: 10px;
-            color: #17202a;
-        }
-        .dica-telefone {
-            font-size: 12px;
-            color: #68737d;
-            margin-top: 4px;
-            padding-left: 4px;
-        }
-        .dica-telefone i {
-            margin-right: 4px;
-        }
+        .item-chave .selecionar { font-size: 20px; cursor: pointer; color: #cbd2d9; }
+        .item-chave .selecionar.ativa { color: #0b6b3a; }
+        .chave-input-group { display: flex; gap: 8px; margin-top: 8px; }
+        .chave-input-group input { flex: 1; padding: 10px 12px; }
+        .chave-input-group button { margin: 0; padding: 10px 18px; width: auto; }
+        .secao-chaves { border-top: 2px solid #e8edf2; padding-top: 16px; margin-top: 16px; }
+        .botoes-topo { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .botoes-topo button { width: auto; padding: 10px 20px; margin: 0; }
+        .btn-pequeno { padding: 6px 14px; font-size: 13px; margin: 0; }
+        .filtros { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 16px; }
+        .filtros .grupo { flex: 1 1 160px; }
+        .filtros .grupo label { margin: 0 0 4px; font-size: 13px; }
+        .filtros .grupo input { padding: 8px 10px; }
+        .filtros .grupo button { margin: 0; padding: 8px 12px; font-size: 13px; }
+        .item-recebimento { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #e8edf2; background: #fafcff; border-radius: 8px; margin-bottom: 6px; }
+        .item-recebimento .info { display: flex; flex-wrap: wrap; gap: 10px; font-size: 14px; color: #17202a; }
+        .item-recebimento .info .data { color: #68737d; min-width: 100px; }
+        .item-recebimento .info .valor { font-weight: bold; color: #0b6b3a; }
+        .item-recebimento .info .descricao { color: #17202a; }
+        .item-recebimento .status { font-size: 13px; font-weight: bold; padding: 4px 12px; border-radius: 20px; }
+        .status-pendente { background: #fef6e0; color: #a67c00; }
+        .status-pago { background: #dff0d8; color: #1e7e34; }
+        .item-recebimento .acoes button { margin: 0 0 0 8px; padding: 4px 12px; font-size: 13px; }
+        .sem-dados { text-align: center; color: #68737d; padding: 20px; }
+        .total { text-align: right; font-weight: bold; font-size: 16px; margin-top: 10px; border-top: 2px solid #0b6b3a; padding-top: 10px; color: #17202a; }
+        .dica-telefone { font-size: 12px; color: #68737d; margin-top: 4px; padding-left: 4px; }
+        .dica-telefone i { margin-right: 4px; }
+
+        /* Estilos para modais de senha */
+        .senha-modal .modal { max-width: 400px; }
+        .senha-modal .modal p { color: #68737d; margin: 4px 0 12px; }
+        .senha-modal .modal .erro-senha { color: #a42020; font-size: 14px; margin-top: 6px; display: none; }
+        .senha-modal .modal .erro-senha.visible { display: block; }
+        .senha-modal .modal input { margin-bottom: 10px; }
+        .senha-modal .modal .btn-group { margin-top: 6px; }
     </style>
 </head>
 <body>
     <header>
-        <div id="secretArea"></div>
         <h1 id="headerTitulo"><i class="fas fa-cash-register"></i> PIX Recebimentos</h1>
         <p id="headerSubtitulo">Gerencie suas cobranças e recebimentos</p>
     </header>
@@ -461,7 +118,7 @@
         </section>
 
         <div class="botoes-topo">
-            <button class="secondary" id="btnGerenciar" onclick="abrirModalGerenciar()" style="display:none;">⚙️ Gerenciar recebedor</button>
+            <button class="secondary" onclick="abrirGerenciar()">⚙️ Gerenciar recebedor</button>
             <button class="secondary" onclick="abrirModalRelatorios()">📊 Relatórios</button>
         </div>
 
@@ -516,6 +173,38 @@
         </div>
     </div>
 
+    <!-- MODAL CRIAR SENHA -->
+    <div class="modal-overlay senha-modal" id="modalCriarSenha">
+        <div class="modal">
+            <h2>🔐 Criar senha de acesso</h2>
+            <p>Defina uma senha para acessar o gerenciamento de chaves PIX.</p>
+            <label for="novaSenha">Nova senha</label>
+            <input type="password" id="novaSenha" placeholder="Digite sua senha" maxlength="20">
+            <label for="confirmaSenha">Confirmar senha</label>
+            <input type="password" id="confirmaSenha" placeholder="Digite novamente" maxlength="20">
+            <div class="erro-senha" id="erroCriar">As senhas não coincidem ou estão vazias.</div>
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharModalCriarSenha()">Cancelar</button>
+                <button class="primary" onclick="criarSenha()">Salvar senha</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ENTRAR SENHA -->
+    <div class="modal-overlay senha-modal" id="modalEntrarSenha">
+        <div class="modal">
+            <h2>🔐 Acesso restrito</h2>
+            <p>Digite sua senha para gerenciar as chaves PIX.</p>
+            <label for="senhaAcesso">Senha</label>
+            <input type="password" id="senhaAcesso" placeholder="Digite sua senha" maxlength="20">
+            <div class="erro-senha" id="erroEntrar">Senha incorreta. Tente novamente.</div>
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharModalEntrarSenha()">Cancelar</button>
+                <button class="primary" onclick="entrarSenha()">Entrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL RELATÓRIOS -->
     <div class="modal-overlay" id="modalRelatorios">
         <div class="modal" style="max-width: 820px;">
@@ -537,62 +226,60 @@
     <script>
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
-        let secretClicks = 0, secretTimer = null;
+        let autenticado = false;
 
-        // ---------- SEGREDO: 7 cliques no canto superior direito ----------
-        document.getElementById('secretArea').addEventListener('click', function(e) {
-            e.stopPropagation();
-            secretClicks++;
-            if (!secretTimer) {
-                secretTimer = setTimeout(() => { 
-                    secretClicks = 0; 
-                    secretTimer = null; 
-                }, 1000);
-            }
-            if (secretClicks >= 7) {
-                secretClicks = 0;
-                clearTimeout(secretTimer);
-                secretTimer = null;
-                // Habilita edição
-                habilitarEdicao();
-                const area = document.getElementById('secretArea');
-                area.style.background = 'rgba(255,255,255,0.2)';
-                setTimeout(() => { area.style.background = 'transparent'; }, 300);
-                console.log('🔓 Modo de edição ativado!');
-            }
-        });
-
-        // ---------- CONTROLE DE EDIÇÃO ----------
-        function habilitarEdicao() {
-            // Botão Gerenciar (no topo)
-            const btnGerenciar = document.getElementById('btnGerenciar');
-            btnGerenciar.classList.add('active');
-            btnGerenciar.style.display = 'block';
-            btnGerenciar.style.opacity = '1';
-            btnGerenciar.style.pointerEvents = 'auto';
-            // Botão Editar (no resumo)
-            const editBtn = document.querySelector('.resumo .btn-edit');
-            if (editBtn) {
-                editBtn.classList.add('active');
-                editBtn.style.opacity = '1';
-                editBtn.style.pointerEvents = 'auto';
+        // ---------- GERENCIAMENTO DE SENHA ----------
+        function abrirGerenciar() {
+            const senhaSalva = localStorage.getItem('pixSenha');
+            if (!senhaSalva) {
+                // Primeiro acesso: criar senha
+                $('modalCriarSenha').classList.add('active');
+                $('novaSenha').value = '';
+                $('confirmaSenha').value = '';
+                document.getElementById('erroCriar').classList.remove('visible');
+            } else if (autenticado) {
+                // Já autenticado nesta sessão
+                abrirModalGerenciar();
+            } else {
+                // Pedir senha
+                $('modalEntrarSenha').classList.add('active');
+                $('senhaAcesso').value = '';
+                document.getElementById('erroEntrar').classList.remove('visible');
             }
         }
 
-        function desabilitarEdicao() {
-            // Botão Gerenciar
-            const btnGerenciar = document.getElementById('btnGerenciar');
-            btnGerenciar.classList.remove('active');
-            btnGerenciar.style.display = 'none';
-            btnGerenciar.style.opacity = '0';
-            btnGerenciar.style.pointerEvents = 'none';
-            // Botão Editar
-            const editBtn = document.querySelector('.resumo .btn-edit');
-            if (editBtn) {
-                editBtn.classList.remove('active');
-                editBtn.style.opacity = '0.4';
-                editBtn.style.pointerEvents = 'none';
+        function criarSenha() {
+            const senha = $('novaSenha').value.trim();
+            const confirma = $('confirmaSenha').value.trim();
+            if (!senha || senha !== confirma) {
+                document.getElementById('erroCriar').classList.add('visible');
+                return;
             }
+            localStorage.setItem('pixSenha', senha);
+            autenticado = true;
+            fecharModalCriarSenha();
+            abrirModalGerenciar();
+        }
+
+        function entrarSenha() {
+            const senha = $('senhaAcesso').value.trim();
+            const senhaSalva = localStorage.getItem('pixSenha');
+            if (senha === senhaSalva) {
+                autenticado = true;
+                fecharModalEntrarSenha();
+                abrirModalGerenciar();
+            } else {
+                document.getElementById('erroEntrar').classList.add('visible');
+                $('senhaAcesso').value = '';
+            }
+        }
+
+        function fecharModalCriarSenha() {
+            $('modalCriarSenha').classList.remove('active');
+        }
+
+        function fecharModalEntrarSenha() {
+            $('modalEntrarSenha').classList.remove('active');
         }
 
         // ---------- UTILITÁRIOS ----------
@@ -712,16 +399,6 @@
             localStorage.setItem('pixConfig', JSON.stringify(config));
         }
 
-        function getChaveAtiva(config) {
-            if (!config.chaves || config.chaves.length === 0) return null;
-            if (config.chaveAtiva !== null && config.chaves.some(c => c.id === config.chaveAtiva)) {
-                return config.chaves.find(c => c.id === config.chaveAtiva).chave;
-            }
-            config.chaveAtiva = config.chaves[0].id;
-            saveConfig(config);
-            return config.chaves[0].chave;
-        }
-
         // ---------- ATUALIZAR INTERFACE ----------
         function atualizarResumo() {
             const config = getConfig();
@@ -740,36 +417,21 @@
                             <strong>Cidade:</strong> ${config.cidade}
                             ${config.txid && config.txid !== '***' ? `<br><strong>TXID:</strong> ${config.txid}` : ''}
                         </div>
-                        <button class="btn-edit" onclick="abrirModalGerenciar()">✎ Editar</button>
+                        <button class="btn-edit" onclick="abrirGerenciar()">✎ Editar</button>
                     </div>
                 `;
             } else {
                 div.innerHTML = `
                     <div style="background:#fef6e0; padding:12px 16px; border-radius:10px; border-left:4px solid #f1b04a; margin-bottom:12px;">
                         <strong>⚠️ Complete o cadastro do recebedor e adicione pelo menos uma chave PIX.</strong>
-                        <button class="primary" onclick="abrirModalGerenciar()" style="width:auto; padding:8px 16px; margin-top:6px;">Configurar agora</button>
+                        <button class="primary" onclick="abrirGerenciar()" style="width:auto; padding:8px 16px; margin-top:6px;">Configurar agora</button>
                     </div>
                 `;
-            }
-            // Aplica o estado de edição (desabilitado por padrão) - mas se o segredo já estiver ativo, mantém habilitado
-            const gerenciarBtn = document.getElementById('btnGerenciar');
-            if (!gerenciarBtn.classList.contains('active')) {
-                desabilitarEdicao();
-            } else {
-                // Se já estiver ativo, reaplica a habilitação
-                habilitarEdicao();
             }
         }
 
         // ---------- MODAL GERENCIAR ----------
         function abrirModalGerenciar() {
-            // Se o botão Gerenciar estiver desabilitado, não abre (a menos que o segredo tenha sido ativado)
-            const btn = document.getElementById('btnGerenciar');
-            if (!btn.classList.contains('active') && btn.style.display === 'none') {
-                // Tenta ativar o segredo? Não, apenas avisa que precisa do segredo.
-                alert('Para acessar esta função, clique 7 vezes no canto superior direito da tela.');
-                return;
-            }
             const config = getConfig();
             $('modalHeader').value = config.header || 'PIX Recebimentos';
             $('modalNome').value = config.nome || '';
@@ -785,9 +447,7 @@
 
         function fecharModalGerenciar() {
             $('modalGerenciar').classList.remove('active');
-            // Desabilita a edição ao fechar o modal (a menos que o segredo ainda esteja ativo)
-            // Mas o segredo é reaplicado ao clicar novamente.
-            desabilitarEdicao();
+            // Mantém autenticado para a sessão
         }
 
         function renderizarListaChaves(config) {
@@ -928,9 +588,6 @@
             $('geralStatus').textContent = '✓ Configurações salvas!';
             $('geralStatus').style.color = '#0b6b3a';
             setTimeout(() => { $('geralStatus').textContent = ''; }, 3000);
-            // Fecha o modal após salvar? Pode fechar, mas mantém aberto para editar mais.
-            // Se quiser fechar automaticamente, descomente:
-            // fecharModalGerenciar();
         }
 
         function atualizarCabecalho(titulo) {
@@ -1050,20 +707,20 @@
             if (!config.nome || !config.cidade) {
                 $('recebStatus').textContent = 'Configure o recebedor primeiro.';
                 $('recebStatus').style.color = '#a42020';
-                abrirModalGerenciar();
+                abrirGerenciar(); // pede senha se necessário
                 return;
             }
             if (!config.chaves || config.chaves.length === 0) {
                 $('recebStatus').textContent = 'Cadastre pelo menos uma chave PIX.';
                 $('recebStatus').style.color = '#a42020';
-                abrirModalGerenciar();
+                abrirGerenciar();
                 return;
             }
             const chaveAtiva = config.chaves.find(c => c.id === config.chaveAtiva);
             if (!chaveAtiva) {
                 $('recebStatus').textContent = 'Selecione uma chave ativa.';
                 $('recebStatus').style.color = '#a42020';
-                abrirModalGerenciar();
+                abrirGerenciar();
                 return;
             }
             const chave = chaveAtiva.chave;
@@ -1156,8 +813,6 @@
             document.getElementById('filtroFim').value = hoje;
             const lista = getRecebimentos();
             renderizarLista(lista);
-            // Garantir que a edição comece desabilitada
-            desabilitarEdicao();
         }
 
         iniciar();
@@ -1170,15 +825,17 @@
         window.limparFiltros = limparFiltros;
         window.abrirModalRelatorios = abrirModalRelatorios;
         window.fecharModalRelatorios = fecharModalRelatorios;
-        window.abrirModalGerenciar = abrirModalGerenciar;
+        window.abrirGerenciar = abrirGerenciar;
         window.fecharModalGerenciar = fecharModalGerenciar;
         window.adicionarChave = adicionarChave;
         window.selecionarChave = selecionarChave;
         window.editarChave = editarChave;
         window.excluirChave = excluirChave;
         window.salvarConfiguracoes = salvarConfiguracoes;
-        window.habilitarEdicao = habilitarEdicao;
-        window.desabilitarEdicao = desabilitarEdicao;
+        window.criarSenha = criarSenha;
+        window.entrarSenha = entrarSenha;
+        window.fecharModalCriarSenha = fecharModalCriarSenha;
+        window.fecharModalEntrarSenha = fecharModalEntrarSenha;
     </script>
 </body>
 </html>
