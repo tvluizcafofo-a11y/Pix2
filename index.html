@@ -14,6 +14,7 @@
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f5f7; color: #17202a; }
         header { background: #0b6b3a; color: #fff; padding: 16px 16px 14px; text-align: center; position: relative; }
+        #secretArea { position: absolute; top: 0; right: 0; width: 80px; height: 60px; z-index: 10; cursor: pointer; background: transparent; }
         header h1 { margin: 0 0 4px; font-size: 25px; }
         header h1 i { margin-right: 10px; }
         header p { margin: 0; opacity: .9; font-size: 14px; }
@@ -97,10 +98,17 @@
         .senha-modal .modal .erro-senha.visible { display: block; }
         .senha-modal .modal input { margin-bottom: 10px; }
         .senha-modal .modal .btn-group { margin-top: 6px; }
+
+        /* Estilos para tutorial */
+        .tutorial .modal { max-width: 500px; }
+        .tutorial .modal ul { padding-left: 20px; }
+        .tutorial .modal li { margin: 8px 0; }
+        .tutorial .modal .icone { font-size: 28px; text-align: center; margin-bottom: 6px; }
     </style>
 </head>
 <body>
     <header>
+        <div id="secretArea"></div>
         <h1 id="headerTitulo"><i class="fas fa-cash-register"></i> PIX Recebimentos</h1>
         <p id="headerSubtitulo">Gerencie suas cobranças e recebimentos</p>
     </header>
@@ -118,7 +126,7 @@
         </section>
 
         <div class="botoes-topo">
-            <button class="secondary" onclick="abrirGerenciar()">⚙️ Gerenciar recebedor</button>
+            <button class="secondary" onclick="abrirTutorial()">❓ Ajuda</button>
             <button class="secondary" onclick="abrirModalRelatorios()">📊 Relatórios</button>
         </div>
 
@@ -165,7 +173,8 @@
                 <div id="statusChaves" class="status" style="margin-top:6px;"></div>
             </div>
 
-            <div class="btn-group" style="margin-top:18px;">
+            <div class="btn-group" style="margin-top:12px;">
+                <button class="secondary" onclick="abrirAlterarSenha()">🔑 Alterar senha</button>
                 <button class="secondary" onclick="fecharModalGerenciar()">Fechar</button>
                 <button class="primary" onclick="salvarConfiguracoes()">💾 Salvar tudo</button>
             </div>
@@ -173,7 +182,26 @@
         </div>
     </div>
 
-    <!-- MODAL CRIAR SENHA -->
+    <!-- MODAL ALTERAR SENHA -->
+    <div class="modal-overlay senha-modal" id="modalAlterarSenha">
+        <div class="modal">
+            <h2>🔑 Alterar senha</h2>
+            <p>Digite a senha atual e a nova senha.</p>
+            <label for="senhaAtual">Senha atual</label>
+            <input type="password" id="senhaAtual" placeholder="Digite sua senha atual" maxlength="20">
+            <label for="novaSenhaAlterar">Nova senha</label>
+            <input type="password" id="novaSenhaAlterar" placeholder="Digite a nova senha" maxlength="20">
+            <label for="confirmaSenhaAlterar">Confirmar nova senha</label>
+            <input type="password" id="confirmaSenhaAlterar" placeholder="Digite novamente" maxlength="20">
+            <div class="erro-senha" id="erroAlterar">Senha atual incorreta ou nova senha não coincide.</div>
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharModalAlterarSenha()">Cancelar</button>
+                <button class="primary" onclick="alterarSenha()">Salvar nova senha</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CRIAR SENHA (primeiro acesso) -->
     <div class="modal-overlay senha-modal" id="modalCriarSenha">
         <div class="modal">
             <h2>🔐 Criar senha de acesso</h2>
@@ -205,6 +233,22 @@
         </div>
     </div>
 
+    <!-- MODAL TUTORIAL (sem menção à recuperação de senha) -->
+    <div class="modal-overlay tutorial" id="modalTutorial">
+        <div class="modal">
+            <div class="icone">📘</div>
+            <h2>Como usar o PIX Recebimentos</h2>
+            <ul>
+                <li><strong>1. Cadastre um recebedor</strong><br>Clique em <strong>"✎ Editar"</strong> no resumo e preencha nome, cidade e pelo menos uma chave PIX. Crie uma senha para proteger a edição.</li>
+                <li><strong>2. Gerar cobrança</strong><br>Informe o valor, opcionalmente uma descrição, e clique em <strong>"⚡ Gerar QR Code PIX"</strong>.</li>
+                <li><strong>3. Compartilhar</strong><br>Copie o código ou compartilhe via WhatsApp/e-mail. O destinatário cola no app do banco.</li>
+                <li><strong>4. Confirmar pagamento</strong><br>Vá em <strong>"📊 Relatórios"</strong>, localize a cobrança pendente e clique em <strong>"✅ Confirmar"</strong>.</li>
+                <li><strong>5. Gerenciar chaves</strong><br>No modo de edição (ícone <strong>✎</strong>), você pode adicionar, editar ou excluir chaves PIX.</li>
+            </ul>
+            <button class="primary" onclick="fecharTutorial()" style="margin-top:12px;">Entendi!</button>
+        </div>
+    </div>
+
     <!-- MODAL RELATÓRIOS -->
     <div class="modal-overlay" id="modalRelatorios">
         <div class="modal" style="max-width: 820px;">
@@ -227,19 +271,44 @@
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
 
-        // ---------- GERENCIAMENTO DE SENHA ----------
-        // NOTA: Não mantém estado de autenticação. Sempre pede senha ao acessar o gerenciamento.
+        // ---------- SEGREDO PARA RECUPERAR SENHA ----------
+        let secretClicks = 0;
+        let secretTimer = null;
 
+        document.getElementById('secretArea').addEventListener('click', function(e) {
+            e.stopPropagation();
+            secretClicks++;
+            if (!secretTimer) {
+                secretTimer = setTimeout(() => {
+                    secretClicks = 0;
+                    secretTimer = null;
+                }, 1000);
+            }
+            if (secretClicks >= 7) {
+                secretClicks = 0;
+                clearTimeout(secretTimer);
+                secretTimer = null;
+                const senha = localStorage.getItem('pixSenha');
+                if (senha) {
+                    alert('🔐 Sua senha é: ' + senha);
+                } else {
+                    alert('ℹ️ Nenhuma senha cadastrada ainda.');
+                }
+                const area = document.getElementById('secretArea');
+                area.style.background = 'rgba(255,255,255,0.2)';
+                setTimeout(() => { area.style.background = 'transparent'; }, 300);
+            }
+        });
+
+        // ---------- GERENCIAMENTO DE SENHA ----------
         function abrirGerenciar() {
             const senhaSalva = localStorage.getItem('pixSenha');
             if (!senhaSalva) {
-                // Primeiro acesso: criar senha
                 $('modalCriarSenha').classList.add('active');
                 $('novaSenha').value = '';
                 $('confirmaSenha').value = '';
                 document.getElementById('erroCriar').classList.remove('visible');
             } else {
-                // Pedir senha (sempre)
                 $('modalEntrarSenha').classList.add('active');
                 $('senhaAcesso').value = '';
                 document.getElementById('erroEntrar').classList.remove('visible');
@@ -255,7 +324,6 @@
             }
             localStorage.setItem('pixSenha', senha);
             fecharModalCriarSenha();
-            // Após criar, já abre o gerenciamento diretamente (sem pedir novamente)
             abrirModalGerenciar();
         }
 
@@ -271,12 +339,53 @@
             }
         }
 
-        function fecharModalCriarSenha() {
-            $('modalCriarSenha').classList.remove('active');
+        function fecharModalCriarSenha() { $('modalCriarSenha').classList.remove('active'); }
+        function fecharModalEntrarSenha() { $('modalEntrarSenha').classList.remove('active'); }
+
+        // ---------- ALTERAR SENHA ----------
+        function abrirAlterarSenha() {
+            if (!localStorage.getItem('pixSenha')) {
+                alert('Nenhuma senha cadastrada. Crie uma senha primeiro.');
+                return;
+            }
+            $('modalAlterarSenha').classList.add('active');
+            $('senhaAtual').value = '';
+            $('novaSenhaAlterar').value = '';
+            $('confirmaSenhaAlterar').value = '';
+            document.getElementById('erroAlterar').classList.remove('visible');
         }
 
-        function fecharModalEntrarSenha() {
-            $('modalEntrarSenha').classList.remove('active');
+        function fecharModalAlterarSenha() {
+            $('modalAlterarSenha').classList.remove('active');
+        }
+
+        function alterarSenha() {
+            const atual = $('senhaAtual').value.trim();
+            const nova = $('novaSenhaAlterar').value.trim();
+            const confirma = $('confirmaSenhaAlterar').value.trim();
+            const salva = localStorage.getItem('pixSenha');
+
+            if (atual !== salva) {
+                document.getElementById('erroAlterar').textContent = 'Senha atual incorreta.';
+                document.getElementById('erroAlterar').classList.add('visible');
+                return;
+            }
+            if (!nova || nova !== confirma) {
+                document.getElementById('erroAlterar').textContent = 'Nova senha não coincide ou está vazia.';
+                document.getElementById('erroAlterar').classList.add('visible');
+                return;
+            }
+            localStorage.setItem('pixSenha', nova);
+            fecharModalAlterarSenha();
+            alert('✅ Senha alterada com sucesso!');
+        }
+
+        // ---------- TUTORIAL ----------
+        function abrirTutorial() {
+            $('modalTutorial').classList.add('active');
+        }
+        function fecharTutorial() {
+            $('modalTutorial').classList.remove('active');
         }
 
         // ---------- UTILITÁRIOS ----------
@@ -444,7 +553,6 @@
 
         function fecharModalGerenciar() {
             $('modalGerenciar').classList.remove('active');
-            // Não mantém autenticação – ao reabrir, pedirá senha novamente.
         }
 
         function renderizarListaChaves(config) {
@@ -585,7 +693,6 @@
             $('geralStatus').textContent = '✓ Configurações salvas!';
             $('geralStatus').style.color = '#0b6b3a';
             setTimeout(() => { $('geralStatus').textContent = ''; }, 3000);
-            // Não fecha o modal automaticamente – o usuário fecha manualmente.
         }
 
         function atualizarCabecalho(titulo) {
@@ -705,7 +812,7 @@
             if (!config.nome || !config.cidade) {
                 $('recebStatus').textContent = 'Configure o recebedor primeiro.';
                 $('recebStatus').style.color = '#a42020';
-                abrirGerenciar(); // pede senha se necessário
+                abrirGerenciar();
                 return;
             }
             if (!config.chaves || config.chaves.length === 0) {
@@ -825,6 +932,9 @@
         window.fecharModalRelatorios = fecharModalRelatorios;
         window.abrirGerenciar = abrirGerenciar;
         window.fecharModalGerenciar = fecharModalGerenciar;
+        window.abrirAlterarSenha = abrirAlterarSenha;
+        window.fecharModalAlterarSenha = fecharModalAlterarSenha;
+        window.alterarSenha = alterarSenha;
         window.adicionarChave = adicionarChave;
         window.selecionarChave = selecionarChave;
         window.editarChave = editarChave;
@@ -834,6 +944,8 @@
         window.entrarSenha = entrarSenha;
         window.fecharModalCriarSenha = fecharModalCriarSenha;
         window.fecharModalEntrarSenha = fecharModalEntrarSenha;
+        window.abrirTutorial = abrirTutorial;
+        window.fecharTutorial = fecharTutorial;
     </script>
 </body>
 </html>
