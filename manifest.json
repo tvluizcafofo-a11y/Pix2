@@ -4,7 +4,7 @@
   "description": "Gerencie cobranças e recebimentos PIX",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0b6b3a",
+  "background_color": "#f3f5f7",
   "theme_color": "#0b6b3a",
   "orientation": "portrait",
   "icons": [
