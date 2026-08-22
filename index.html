@@ -806,7 +806,7 @@
             renderizarLista(lista);
         }
 
-        // ---------- GERAR QR CODE ----------
+        // ---------- GERAR QR CODE COM SCROLL PARA O RESULTADO ----------
         function gerarPix() {
             const config = getConfig();
             if (!config.nome || !config.cidade) {
@@ -844,6 +844,8 @@
             const txid = config.txid || '***';
             const payload = gerarPayload(config, chave, valor, descricao);
             adicionarRecebimento(valor, descricao, txid, chave);
+            
+            // Exibe o QR Code
             $('payload').textContent = payload;
             $('valorExibido').textContent = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             $('qrcode').innerHTML = '';
@@ -853,10 +855,18 @@
                 return;
             }
             new QRCode($('qrcode'), { text: payload, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M });
+            
+            // Torna o resultado visível
             document.getElementById('resultado').style.display = 'block';
             $('recebStatus').textContent = '✓ QR Code gerado. Recebimento pendente.';
             $('recebStatus').style.color = '#0b6b3a';
-            document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
+            
+            // Scroll suave até o cabeçalho "📲 Pagamento PIX"
+            const resultadoEl = document.getElementById('resultado');
+            setTimeout(() => {
+                resultadoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+            
             $('valor').value = '';
         }
 
