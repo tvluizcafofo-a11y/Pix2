@@ -36,8 +36,47 @@
         .danger { background: #fdeaea; color: #a42020; }
         .danger:hover { background: #fccccc; }
         .result { text-align: center; display: none; background: #fff; }
-        #qrcode { display: inline-block; padding: 16px; background: #fff; border-radius: 16px; border: 4px solid #0b6b3a; box-shadow: 0 4px 20px rgba(11,107,58,0.2); margin: 8px auto; }
-        #qrcode img, #qrcode canvas { max-width: 100%; height: auto; display: block; }
+        /* QR Code container com posicionamento relativo para o overlay */
+        #qrcode-wrapper {
+            position: relative;
+            display: inline-block;
+            padding: 16px;
+            background: #fff;
+            border-radius: 16px;
+            border: 4px solid #0b6b3a;
+            box-shadow: 0 4px 20px rgba(11,107,58,0.2);
+            margin: 8px auto;
+        }
+        #qrcode {
+            display: block;
+        }
+        #qrcode img, #qrcode canvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        /* Ícone centralizado sobre o QR Code */
+        #qrcode-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #fff;
+            padding: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            pointer-events: none;
+            z-index: 5;
+        }
+        #qrcode-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+            display: block;
+        }
         .valor { font-size: 31px; font-weight: bold; color: #0b6b3a; margin: 10px; }
         .copybox { word-break: break-all; background: #f4f6f8; padding: 12px; border-radius: 10px; text-align: left; font-size: 13px; color: #17202a; }
         .status { margin-top: 10px; text-align: center; font-weight: bold; }
@@ -103,7 +142,7 @@
         .tutorial .modal .icone { font-size: 28px; text-align: center; margin-bottom: 6px; }
 
         @media (prefers-color-scheme: dark) {
-            body, .card, .modal, header, .resumo, .copybox, .item-chave, .item-recebimento, #qrcode {
+            body, .card, .modal, header, .resumo, .copybox, .item-chave, .item-recebimento, #qrcode-wrapper {
                 background: #fff !important;
                 color: #17202a !important;
                 border-color: #cbd2d9 !important;
@@ -143,7 +182,12 @@
         <section id="resultado" class="card result">
             <h2>📲 Pagamento PIX</h2>
             <div class="valor" id="valorExibido">R$ 0,00</div>
-            <div id="qrcode"></div>
+            <div id="qrcode-wrapper">
+                <div id="qrcode"></div>
+                <div id="qrcode-icon">
+                    <img src="icon-192.png" alt="Logo" id="qrcodeIconImg">
+                </div>
+            </div>
             <p><b>Aponte a câmera do celular para o QR Code</b></p>
             <button class="secondary" onclick="copiarPix()">📋 Copiar PIX Copia e Cola</button>
             <button class="secondary" onclick="compartilharPix()">📤 Compartilhar código PIX</button>
@@ -820,20 +864,36 @@
             adicionarRecebimento(valor, descricao, txid, chave);
             $('payload').textContent = payload;
             $('valorExibido').textContent = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            $('qrcode').innerHTML = '';
+            
+            // Limpa o QR Code
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
             if (typeof QRCode === 'undefined') {
                 $('recebStatus').textContent = 'Biblioteca QR Code não carregada.';
                 $('recebStatus').style.color = '#a42020';
                 return;
             }
-            new QRCode($('qrcode'), { text: payload, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M });
+            
+            // Gera o QR Code
+            new QRCode(qrContainer, { 
+                text: payload, 
+                width: 260, 
+                height: 260, 
+                correctLevel: QRCode.CorrectLevel.M 
+            });
+            
+            // Exibe o wrapper do QR Code (que contém o ícone)
+            document.getElementById('qrcode-wrapper').style.display = 'inline-block';
             document.getElementById('resultado').style.display = 'block';
             $('recebStatus').textContent = '✓ QR Code gerado. Recebimento pendente.';
             $('recebStatus').style.color = '#0b6b3a';
+            
             const resultadoEl = document.getElementById('resultado');
             setTimeout(() => {
                 resultadoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 200);
+            
             $('valor').value = '';
         }
 
@@ -878,6 +938,9 @@
 
         // INICIALIZAÇÃO
         function iniciar() {
+            // Esconde o wrapper do QR Code inicialmente
+            document.getElementById('qrcode-wrapper').style.display = 'none';
+            
             const config = getConfig();
             atualizarCabecalho(config.header || 'PIX Recebimentos');
             atualizarResumo();
