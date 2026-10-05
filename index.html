@@ -15,7 +15,6 @@
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f5f7; color: #17202a; }
         header { background: #0b6b3a; color: #fff; padding: 16px 16px 14px; text-align: center; position: relative; }
-        #secretArea { position: absolute; top: 0; right: 0; width: 80px; height: 60px; z-index: 10; cursor: pointer; background: transparent; }
         header h1 { margin: 0 0 4px; font-size: 25px; color: #fff; }
         header h1 .icone { margin-right: 10px; }
         header p { margin: 0; opacity: .9; font-size: 14px; color: #fff; }
@@ -154,7 +153,6 @@
 </head>
 <body>
     <header>
-        <div id="secretArea"></div>
         <h1 id="headerTitulo">
             <span class="icone">💳</span>
             <span id="tituloCabecalho">PIX Recebimentos</span>
@@ -249,7 +247,7 @@
         </div>
     </div>
 
-    <!-- MODAL CRIAR SENHA -->
+    <!-- MODAL CRIAR SENHA — V1.1 -->
     <div class="modal-overlay senha-modal" id="modalCriarSenha">
         <div class="modal">
             <h2>🔐 Criar senha de acesso</h2>
@@ -319,30 +317,74 @@
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
 
-        // SEGREDO PARA RECUPERAR SENHA
-        let secretClicks = 0, secretTimer = null;
-        document.getElementById('secretArea').addEventListener('click', function(e) {
-            e.stopPropagation();
-            secretClicks++;
-            if (!secretTimer) {
-                secretTimer = setTimeout(() => { secretClicks = 0; secretTimer = null; }, 1000);
-            }
-            if (secretClicks >= 7) {
-                secretClicks = 0;
-                clearTimeout(secretTimer);
-                secretTimer = null;
-                const senha = localStorage.getItem('pixSenha');
-                alert(senha ? '🔐 Sua senha é: ' + senha : 'ℹ️ Nenhuma senha cadastrada ainda.');
-                const area = document.getElementById('secretArea');
-                area.style.background = 'rgba(255,255,255,0.2)';
-                setTimeout(() => { area.style.background = 'transparent'; }, 300);
-            }
-        });
+        // ===== GERENCIAMENTO DE SENHA — V1.1 =====
+        // A senha não é mais armazenada em texto simples. É derivada com
+        // PBKDF2 + SHA-256 e um salt aleatório, usando a Web Crypto API.
+        const PASSWORD_HASH_KEY = 'pixSenhaHash';
+        const PASSWORD_SALT_KEY = 'pixSenhaSalt';
+        const LEGACY_PASSWORD_KEY = 'pixSenha';
 
-        // GERENCIAMENTO DE SENHA
-        function abrirGerenciar() {
-            const senhaSalva = localStorage.getItem('pixSenha');
-            if (!senhaSalva) {
+        function bytesToBase64(bytes) {
+            let binary = '';
+            bytes.forEach(b => binary += String.fromCharCode(b));
+            return btoa(binary);
+        }
+
+        function base64ToBytes(base64) {
+            const binary = atob(base64);
+            return Uint8Array.from(binary, c => c.charCodeAt(0));
+        }
+
+        async function hashPassword(password, saltBytes) {
+            const encoder = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']
+            );
+            const bits = await crypto.subtle.deriveBits(
+                { name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' },
+                keyMaterial, 256
+            );
+            return new Uint8Array(bits);
+        }
+
+        async function savePassword(password) {
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const hash = await hashPassword(password, salt);
+            localStorage.setItem(PASSWORD_SALT_KEY, bytesToBase64(salt));
+            localStorage.setItem(PASSWORD_HASH_KEY, bytesToBase64(hash));
+            // Remove a senha antiga em texto simples, se existir.
+            localStorage.removeItem(LEGACY_PASSWORD_KEY);
+        }
+
+        async function verifyPassword(password) {
+            const hashSaved = localStorage.getItem(PASSWORD_HASH_KEY);
+            const saltSaved = localStorage.getItem(PASSWORD_SALT_KEY);
+            if (hashSaved && saltSaved) {
+                const hash = await hashPassword(password, base64ToBytes(saltSaved));
+                const expected = base64ToBytes(hashSaved);
+                if (hash.length !== expected.length) return false;
+                let diff = 0;
+                for (let i = 0; i < hash.length; i++) diff |= hash[i] ^ expected[i];
+                return diff === 0;
+            }
+
+            // Migração única para instalações da V1.0 que ainda possuem
+            // pixSenha em texto simples. Após autenticar, a senha é convertida.
+            const legacy = localStorage.getItem(LEGACY_PASSWORD_KEY);
+            if (legacy !== null && password === legacy) {
+                await savePassword(password);
+                return true;
+            }
+            return false;
+        }
+
+        function hasPassword() {
+            return !!(localStorage.getItem(PASSWORD_HASH_KEY) && localStorage.getItem(PASSWORD_SALT_KEY))
+                || localStorage.getItem(LEGACY_PASSWORD_KEY) !== null;
+        }
+
+        async function abrirGerenciar() {
+            if (!hasPassword()) {
                 $('modalCriarSenha').classList.add('active');
                 $('novaSenha').value = '';
                 $('confirmaSenha').value = '';
@@ -354,25 +396,35 @@
             }
         }
 
-        function criarSenha() {
+        async function criarSenha() {
             const senha = $('novaSenha').value.trim();
             const confirma = $('confirmaSenha').value.trim();
-            if (!senha || senha !== confirma) {
+            if (!senha || senha.length < 6 || senha !== confirma) {
+                document.getElementById('erroCriar').textContent = 'A senha deve ter pelo menos 6 caracteres e coincidir com a confirmação.';
                 document.getElementById('erroCriar').classList.add('visible');
                 return;
             }
-            localStorage.setItem('pixSenha', senha);
-            fecharModalCriarSenha();
-            abrirModalGerenciar();
+            try {
+                await savePassword(senha);
+                fecharModalCriarSenha();
+                abrirModalGerenciar();
+            } catch (e) {
+                alert('Não foi possível proteger a senha neste dispositivo. Tente novamente.');
+            }
         }
 
-        function entrarSenha() {
+        async function entrarSenha() {
             const senha = $('senhaAcesso').value.trim();
-            const senhaSalva = localStorage.getItem('pixSenha');
-            if (senha === senhaSalva) {
-                fecharModalEntrarSenha();
-                abrirModalGerenciar();
-            } else {
+            try {
+                if (await verifyPassword(senha)) {
+                    fecharModalEntrarSenha();
+                    abrirModalGerenciar();
+                } else {
+                    document.getElementById('erroEntrar').classList.add('visible');
+                    $('senhaAcesso').value = '';
+                }
+            } catch (e) {
+                document.getElementById('erroEntrar').textContent = 'Não foi possível verificar a senha. Tente novamente.';
                 document.getElementById('erroEntrar').classList.add('visible');
                 $('senhaAcesso').value = '';
             }
@@ -383,7 +435,7 @@
 
         // ALTERAR SENHA
         function abrirAlterarSenha() {
-            if (!localStorage.getItem('pixSenha')) {
+            if (!hasPassword()) {
                 alert('Nenhuma senha cadastrada. Crie uma senha primeiro.');
                 return;
             }
@@ -396,22 +448,21 @@
 
         function fecharModalAlterarSenha() { $('modalAlterarSenha').classList.remove('active'); }
 
-        function alterarSenha() {
+        async function alterarSenha() {
             const atual = $('senhaAtual').value.trim();
             const nova = $('novaSenhaAlterar').value.trim();
             const confirma = $('confirmaSenhaAlterar').value.trim();
-            const salva = localStorage.getItem('pixSenha');
-            if (atual !== salva) {
+            if (!(await verifyPassword(atual))) {
                 document.getElementById('erroAlterar').textContent = 'Senha atual incorreta.';
                 document.getElementById('erroAlterar').classList.add('visible');
                 return;
             }
-            if (!nova || nova !== confirma) {
-                document.getElementById('erroAlterar').textContent = 'Nova senha não coincide ou está vazia.';
+            if (!nova || nova.length < 6 || nova !== confirma) {
+                document.getElementById('erroAlterar').textContent = 'A nova senha deve ter pelo menos 6 caracteres e coincidir com a confirmação.';
                 document.getElementById('erroAlterar').classList.add('visible');
                 return;
             }
-            localStorage.setItem('pixSenha', nova);
+            await savePassword(nova);
             fecharModalAlterarSenha();
             alert('✅ Senha alterada com sucesso!');
         }
@@ -977,6 +1028,8 @@
         window.fecharModalEntrarSenha = fecharModalEntrarSenha;
         window.abrirTutorial = abrirTutorial;
         window.fecharTutorial = fecharTutorial;
+        // Versão do aplicativo web: 1.1.0
+        window.PIX_APP_VERSION = "1.1.0";
     </script>
 </body>
 </html>
