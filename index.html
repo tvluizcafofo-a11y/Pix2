@@ -35,47 +35,11 @@
         .danger { background: #fdeaea; color: #a42020; }
         .danger:hover { background: #fccccc; }
         .result { text-align: center; display: none; background: #fff; }
-        /* QR Code container com posicionamento relativo para o overlay */
-        #qrcode-wrapper {
-            position: relative;
-            display: inline-block;
-            padding: 16px;
-            background: #fff;
-            border-radius: 16px;
-            border: 4px solid #0b6b3a;
-            box-shadow: 0 4px 20px rgba(11,107,58,0.2);
-            margin: 8px auto;
-        }
-        #qrcode {
-            display: block;
-        }
-        #qrcode img, #qrcode canvas {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-        /* Ícone centralizado sobre o QR Code */
-        #qrcode-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: #fff;
-            padding: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            pointer-events: none;
-            z-index: 5;
-        }
-        #qrcode-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 6px;
-            display: block;
-        }
+        #qrcode-wrapper { position: relative; display: inline-block; padding: 16px; background: #fff; border-radius: 16px; border: 4px solid #0b6b3a; box-shadow: 0 4px 20px rgba(11,107,58,0.2); margin: 8px auto; }
+        #qrcode { display: block; }
+        #qrcode img, #qrcode canvas { max-width: 100%; height: auto; display: block; }
+        #qrcode-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 10px; background: #fff; padding: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); pointer-events: none; z-index: 5; }
+        #qrcode-icon img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; display: block; }
         .valor { font-size: 31px; font-weight: bold; color: #0b6b3a; margin: 10px; }
         .copybox { word-break: break-all; background: #f4f6f8; padding: 12px; border-radius: 10px; text-align: left; font-size: 13px; color: #17202a; }
         .status { margin-top: 10px; text-align: center; font-weight: bold; }
@@ -95,16 +59,35 @@
         @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
 
         .lista-chaves { margin: 12px 0; }
-        .item-chave { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #e8edf2; background: #fafcff; border-radius: 8px; margin-bottom: 6px; color: #17202a; }
+        .item-chave { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #e8edf2; background: #fafcff; border-radius: 8px; margin-bottom: 6px; color: #17202a; }
         .item-chave .chave-texto { font-size: 14px; color: #17202a; flex: 1; margin: 0 10px; word-break: break-all; }
-        .item-chave .acoes-chave button { background: transparent; border: none; padding: 4px 8px; cursor: pointer; font-size: 16px; margin: 0 2px; }
+        .item-chave .acoes-chave { display: flex; gap: 6px; align-items: center; }
+        .item-chave .acoes-chave button { background: #f4f6f8; border: 1px solid #cbd2d9; padding: 7px 11px; font-size: 14px; border-radius: 8px; cursor: pointer; margin: 0; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; }
         .item-chave .acoes-chave .editar { color: #0b6b3a; }
+        .item-chave .acoes-chave .editar:hover { background: #e8f2ed; border-color: #0b6b3a; }
         .item-chave .acoes-chave .excluir { color: #a42020; }
-        .item-chave .selecionar { font-size: 20px; cursor: pointer; color: #cbd2d9; }
+        .item-chave .acoes-chave .excluir:hover { background: #fdeaea; border-color: #a42020; }
+        .item-chave .selecionar { font-size: 22px; cursor: pointer; color: #cbd2d9; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%; transition: all 0.15s; flex-shrink: 0; }
+        .item-chave .selecionar:hover { background: #e8f2ed; color: #0b6b3a; }
         .item-chave .selecionar.ativa { color: #0b6b3a; }
-        .chave-input-group { display: flex; gap: 8px; margin-top: 8px; }
-        .chave-input-group input { flex: 1; padding: 10px 12px; }
-        .chave-input-group button { margin: 0; padding: 10px 18px; width: auto; }
+        .chave-input-group { display: flex; gap: 8px; margin-top: 8px; align-items: stretch; }
+        .chave-input-group .prefixo-chave { display: flex; align-items: center; padding: 0 14px; background: #e8f2ed; color: #0b6b3a; font-weight: bold; border-radius: 10px; border: 1px solid #cbd2d9; font-size: 16px; white-space: nowrap; }
+        .chave-input-group .prefixo-chave.oculto { display: none; }
+        .chave-input-group input { flex: 1; padding: 12px 14px; margin: 0; min-width: 0; font-size: 15px; }
+        .chave-input-group .btn-add { margin: 0; padding: 10px 18px; width: auto; display: flex; align-items: center; gap: 8px; font-size: 15px; white-space: nowrap; }
+        .chave-input-group .btn-add i { font-size: 16px; color: #fff; }
+
+        .label-tipo-chave { display: block; font-weight: bold; margin: 12px 0 6px; color: #17202a; font-size: 14px; }
+        .tipo-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+        .tipo-opcao { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 4px; background: #f4f6f8; border: 2px solid #cbd2d9; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: bold; color: #68737d; margin: 0; transition: all 0.15s; line-height: 1.1; }
+        .tipo-opcao i { font-size: 18px; }
+        .tipo-opcao:hover { background: #e8f2ed; border-color: #0b6b3a; color: #0b6b3a; }
+        .tipo-opcao.active { background: #0b6b3a; border-color: #0b6b3a; color: #fff; }
+        .tipo-opcao.active i { color: #fff; }
+
+        .dica-chave { font-size: 12px; color: #68737d; margin: 8px 0 0; display: flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
+        .dica-chave i { color: #0b6b3a; margin-top: 2px; font-size: 13px; }
+
         .secao-chaves { border-top: 2px solid #e8edf2; padding-top: 16px; margin-top: 16px; }
         .botoes-topo { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .botoes-topo button { width: auto; padding: 10px 20px; margin: 0; }
@@ -125,26 +108,93 @@
         .item-recebimento .acoes button { margin: 0 0 0 8px; padding: 4px 12px; font-size: 13px; }
         .sem-dados { text-align: center; color: #68737d; padding: 20px; }
         .total { text-align: right; font-weight: bold; font-size: 16px; margin-top: 10px; border-top: 2px solid #0b6b3a; padding-top: 10px; color: #17202a; }
-        .dica-telefone { font-size: 12px; color: #68737d; margin-top: 4px; padding-left: 4px; }
-        .dica-telefone i { margin-right: 4px; }
 
-        .senha-modal .modal { max-width: 400px; }
+        .primary:disabled { background: #a0b8ac; color: #fff; cursor: not-allowed; opacity: 0.6; }
+        .primary:disabled:hover { background: #a0b8ac; }
+
+        .senha-modal .modal { max-width: 420px; }
         .senha-modal .modal p { color: #68737d; margin: 4px 0 12px; }
         .senha-modal .modal .erro-senha { color: #a42020; font-size: 14px; margin-top: 6px; display: none; }
         .senha-modal .modal .erro-senha.visible { display: block; }
         .senha-modal .modal input { margin-bottom: 10px; }
         .senha-modal .modal .btn-group { margin-top: 6px; }
 
+        /* Recuperação de senha */
+        .link-esqueci {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: #0b6b3a;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .link-esqueci:hover { color: #095a31; }
+
+        .codigo-recuperacao-display {
+            background: #f4f6f8;
+            border: 2px dashed #0b6b3a;
+            border-radius: 12px;
+            padding: 20px 12px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #0b6b3a;
+            margin: 16px 0;
+            user-select: all;
+            word-break: break-all;
+        }
+
+        .divisor-recuperacao {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 18px 0 14px;
+            color: #68737d;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .divisor-recuperacao::before,
+        .divisor-recuperacao::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #cbd2d9;
+        }
+        .divisor-recuperacao span { padding: 0 12px; }
+
+        .aviso-reset {
+            background: #fef6e0;
+            border-left: 4px solid #f1b04a;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .aviso-reset p { margin: 0 0 6px; }
+        .aviso-reset p:last-of-type { margin-bottom: 10px; }
+        .aviso-reset.danger-box { background: #fdeaea; border-left-color: #a42020; }
+
         .tutorial .modal { max-width: 500px; }
         .tutorial .modal ul { padding-left: 20px; }
         .tutorial .modal li { margin: 8px 0; }
         .tutorial .modal .icone { font-size: 28px; text-align: center; margin-bottom: 6px; }
 
+        @media (max-width: 480px) {
+            .tipo-selector { grid-template-columns: repeat(2, 1fr); }
+            .chave-input-group { flex-wrap: wrap; }
+            .chave-input-group .btn-add { width: 100%; justify-content: center; }
+        }
+
         @media (prefers-color-scheme: dark) {
             body, .card, .modal, header, .resumo, .copybox, .item-chave, .item-recebimento, #qrcode-wrapper {
-                background: #fff !important;
-                color: #17202a !important;
-                border-color: #cbd2d9 !important;
+                background: #fff !important; color: #17202a !important; border-color: #cbd2d9 !important;
             }
             header, header h1, header p { background: #0b6b3a !important; color: #fff !important; }
             input, textarea { background: #fff !important; color: #17202a !important; border-color: #cbd2d9 !important; }
@@ -213,16 +263,40 @@
             <div class="secao-chaves">
                 <h3 style="margin:0 0 10px;">🔑 Chaves PIX</h3>
                 <div id="listaChaves" class="lista-chaves"></div>
-                <div class="chave-input-group" id="novaChaveGroup">
-                    <input type="text" id="novaChaveInput" placeholder="Ex.: +5531999991234, email@email.com, CPF..." maxlength="77">
-                    <button class="primary" onclick="adicionarChave()" style="margin:0;">➕ Adicionar</button>
+
+                <label class="label-tipo-chave">Tipo de chave</label>
+                <div class="tipo-selector" id="tipoSelector">
+                    <button type="button" class="tipo-opcao active" data-tipo="telefone" onclick="selecionarTipoChave('telefone')">
+                        <i class="fas fa-mobile-alt"></i><span>Telefone</span>
+                    </button>
+                    <button type="button" class="tipo-opcao" data-tipo="email" onclick="selecionarTipoChave('email')">
+                        <i class="fas fa-envelope"></i><span>E-mail</span>
+                    </button>
+                    <button type="button" class="tipo-opcao" data-tipo="cpf" onclick="selecionarTipoChave('cpf')">
+                        <i class="fas fa-id-card"></i><span>CPF/CNPJ</span>
+                    </button>
+                    <button type="button" class="tipo-opcao" data-tipo="aleatoria" onclick="selecionarTipoChave('aleatoria')">
+                        <i class="fas fa-key"></i><span>Aleatória</span>
+                    </button>
                 </div>
+
+                <div class="chave-input-group">
+                    <span class="prefixo-chave" id="prefixoChave">+55</span>
+                    <input type="text" id="novaChaveInput" placeholder="DDD + número (ex.: 31999991234)" maxlength="20" inputmode="tel">
+                    <button class="primary btn-add" onclick="adicionarChave()" title="Adicionar chave PIX">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+                <p class="dica-chave">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Digite a chave no campo acima e clique em <strong>+ Adicionar</strong> para cadastrá-la.</span>
+                </p>
                 <div id="statusChaves" class="status" style="margin-top:6px;"></div>
             </div>
             <div class="btn-group" style="margin-top:12px;">
                 <button class="secondary" onclick="abrirAlterarSenha()">🔑 Alterar senha</button>
                 <button class="secondary" onclick="fecharModalGerenciar()">Fechar</button>
-                <button class="primary" onclick="salvarConfiguracoes()">💾 Salvar tudo</button>
+                <button class="primary" id="btnSalvarConfig" onclick="salvarConfiguracoes()" disabled>💾 Salvar tudo</button>
             </div>
             <div id="geralStatus" class="status"></div>
         </div>
@@ -247,7 +321,7 @@
         </div>
     </div>
 
-    <!-- MODAL CRIAR SENHA — V1.1 -->
+    <!-- MODAL CRIAR SENHA -->
     <div class="modal-overlay senha-modal" id="modalCriarSenha">
         <div class="modal">
             <h2>🔐 Criar senha de acesso</h2>
@@ -276,6 +350,96 @@
                 <button class="secondary" onclick="fecharModalEntrarSenha()">Cancelar</button>
                 <button class="primary" onclick="entrarSenha()">Entrar</button>
             </div>
+            <button class="link-esqueci" onclick="abrirRecuperarSenha()">Esqueci minha senha</button>
+        </div>
+    </div>
+
+    <!-- MODAL RECUPERAR SENHA -->
+    <div class="modal-overlay senha-modal" id="modalRecuperarSenha">
+        <div class="modal">
+            <h2>🔓 Recuperar acesso</h2>
+
+            <div id="secaoRecoveryCode">
+                <p>Digite o <strong>código de recuperação</strong> que você salvou ao criar sua senha.</p>
+                <label for="codigoRecuperacao">Código de recuperação</label>
+                <input type="text" id="codigoRecuperacao" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" style="text-transform: uppercase; text-align: center; font-family: 'Courier New', monospace; font-size: 17px; letter-spacing: 2px;">
+                <div class="erro-senha" id="erroRecuperacao">Código inválido. Verifique e tente novamente.</div>
+                <button class="primary" onclick="verificarCodigoRecuperacao()" style="width: 100%;">Verificar código</button>
+                <div class="divisor-recuperacao"><span>OU</span></div>
+            </div>
+
+            <div id="secaoSemCodigo" style="display: none;">
+                <p class="small" style="text-align: center; margin-bottom: 14px;">Nenhum código de recuperação foi cadastrado neste dispositivo (senha antiga).</p>
+                <div class="divisor-recuperacao"><span>OPÇÕES</span></div>
+            </div>
+
+            <div class="aviso-reset">
+                <p><strong>🔓 Redefinir só a senha (mantém os dados)</strong></p>
+                <p class="small">Mantém a configuração do recebedor, chaves PIX e histórico. Menos seguro: qualquer pessoa com acesso a este aparelho pode fazer isso.</p>
+                <button class="secondary" onclick="abrirResetManterDados()" style="width: 100%;">Redefinir mantendo os dados</button>
+            </div>
+
+            <div class="aviso-reset danger-box">
+                <p><strong>🗑️ Apagar tudo e começar do zero</strong></p>
+                <p class="small">Apaga senha, configuração, chaves PIX e histórico. Mais seguro, mas você perde todos os dados.</p>
+                <button class="danger" onclick="abrirResetTudo()" style="width: 100%;">Apagar todos os dados</button>
+            </div>
+
+            <div class="btn-group" style="margin-top: 12px;">
+                <button class="secondary" onclick="fecharModalRecuperarSenha()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOVA SENHA APÓS RECUPERAÇÃO -->
+    <div class="modal-overlay senha-modal" id="modalNovaSenhaRecuperada">
+        <div class="modal">
+            <h2>🔐 Nova senha</h2>
+            <p>Defina uma nova senha de acesso.</p>
+            <label for="novaSenhaRecuperada">Nova senha</label>
+            <input type="password" id="novaSenhaRecuperada" placeholder="Digite a nova senha" maxlength="20">
+            <label for="confirmaSenhaRecuperada">Confirmar nova senha</label>
+            <input type="password" id="confirmaSenhaRecuperada" placeholder="Digite novamente" maxlength="20">
+            <div class="erro-senha" id="erroNovaSenhaRecuperada">As senhas não coincidem ou são muito curtas.</div>
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharModalNovaSenhaRecuperada()">Cancelar</button>
+                <button class="primary" onclick="salvarNovaSenhaRecuperada()">Salvar nova senha</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MOSTRAR CÓDIGO DE RECUPERAÇÃO -->
+    <div class="modal-overlay senha-modal" id="modalMostrarRecuperacao">
+        <div class="modal">
+            <h2>🔑 Código de recuperação</h2>
+            <p><strong>Guarde este código em um lugar seguro.</strong> Você vai precisar dele se esquecer sua senha.</p>
+            <div class="codigo-recuperacao-display" id="codigoRecuperacaoDisplay">XXXX-XXXX-XXXX-XXXX</div>
+            <button class="secondary" onclick="copiarCodigoRecuperacao()" style="width: 100%;">📋 Copiar código</button>
+            <button class="secondary" onclick="baixarCodigoRecuperacao()" style="width: 100%;">💾 Baixar como arquivo</button>
+            <p class="small" style="margin-top: 14px; text-align: center;">⚠️ Sem este código e sem a senha, será necessário apagar todos os dados para recuperar o acesso.</p>
+            <button class="primary" onclick="fecharModalMostrarRecuperacao()" style="width: 100%; margin-top: 8px;">✅ Já salvei o código</button>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR RESET TOTAL -->
+    <div class="modal-overlay senha-modal" id="modalConfirmarReset">
+        <div class="modal">
+            <h2>⚠️ Confirmar exclusão total</h2>
+            <p>Esta ação vai <strong>apagar permanentemente</strong>:</p>
+            <ul style="padding-left: 20px; margin: 8px 0;">
+                <li>Sua senha</li>
+                <li>Configuração do recebedor</li>
+                <li>Todas as chaves PIX cadastradas</li>
+                <li>Histórico de recebimentos</li>
+            </ul>
+            <p><strong>Não há como desfazer.</strong></p>
+            <label for="confirmacaoReset">Digite <strong>APAGAR</strong> para confirmar</label>
+            <input type="text" id="confirmacaoReset" placeholder="APAGAR" style="text-transform: uppercase; text-align: center; font-weight: bold;">
+            <div class="erro-senha" id="erroReset">Digite APAGAR para confirmar.</div>
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharModalConfirmarReset()">Cancelar</button>
+                <button class="danger" onclick="executarResetTotal()">🗑️ Apagar tudo</button>
+            </div>
         </div>
     </div>
 
@@ -290,6 +454,7 @@
                 <li><strong>3. Compartilhar</strong><br>Copie o código ou compartilhe via WhatsApp/e-mail. O destinatário cola no app do banco.</li>
                 <li><strong>4. Confirmar pagamento</strong><br>Vá em <strong>"📊 Relatórios"</strong>, localize a cobrança pendente e clique em <strong>"✅ Confirmar"</strong>.</li>
                 <li><strong>5. Gerenciar chaves</strong><br>No modo de edição (ícone <strong>✎</strong>), você pode adicionar, editar ou excluir chaves PIX.</li>
+                <li><strong>6. Esqueceu a senha?</strong><br>Na tela de login, clique em <strong>"Esqueci minha senha"</strong>. Você pode usar o código de recuperação ou redefinir mantendo os dados.</li>
             </ul>
             <button class="primary" onclick="fecharTutorial()" style="margin-top:12px;">Entendi!</button>
         </div>
@@ -317,11 +482,11 @@
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
 
-        // ===== GERENCIAMENTO DE SENHA — V1.1 =====
-        // A senha não é mais armazenada em texto simples. É derivada com
-        // PBKDF2 + SHA-256 e um salt aleatório, usando a Web Crypto API.
+        // ===== CONSTANTES DE SENHA =====
         const PASSWORD_HASH_KEY = 'pixSenhaHash';
         const PASSWORD_SALT_KEY = 'pixSenhaSalt';
+        const RECOVERY_HASH_KEY = 'pixSenhaRecoveryHash';
+        const RECOVERY_SALT_KEY = 'pixSenhaRecoverySalt';
         const LEGACY_PASSWORD_KEY = 'pixSenha';
 
         function bytesToBase64(bytes) {
@@ -329,12 +494,10 @@
             bytes.forEach(b => binary += String.fromCharCode(b));
             return btoa(binary);
         }
-
         function base64ToBytes(base64) {
             const binary = atob(base64);
             return Uint8Array.from(binary, c => c.charCodeAt(0));
         }
-
         async function hashPassword(password, saltBytes) {
             const encoder = new TextEncoder();
             const keyMaterial = await crypto.subtle.importKey(
@@ -347,12 +510,32 @@
             return new Uint8Array(bits);
         }
 
-        async function savePassword(password) {
+        // Gera código de recuperação no formato XXXX-XXXX-XXXX-XXXX
+        function gerarCodigoRecuperacao() {
+            const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            const bytes = crypto.getRandomValues(new Uint8Array(16));
+            let code = '';
+            for (let i = 0; i < 16; i++) code += alphabet[bytes[i] % alphabet.length];
+            return code.match(/.{1,4}/g).join('-');
+        }
+        function normalizarCodigo(code) {
+            return String(code || '').replace(/[-\s]/g, '').toUpperCase();
+        }
+
+        async function savePassword(password, recoveryCode) {
             const salt = crypto.getRandomValues(new Uint8Array(16));
             const hash = await hashPassword(password, salt);
             localStorage.setItem(PASSWORD_SALT_KEY, bytesToBase64(salt));
             localStorage.setItem(PASSWORD_HASH_KEY, bytesToBase64(hash));
-            // Remove a senha antiga em texto simples, se existir.
+
+            if (recoveryCode) {
+                const normalized = normalizarCodigo(recoveryCode);
+                const rSalt = crypto.getRandomValues(new Uint8Array(16));
+                const rHash = await hashPassword(normalized, rSalt);
+                localStorage.setItem(RECOVERY_SALT_KEY, bytesToBase64(rSalt));
+                localStorage.setItem(RECOVERY_HASH_KEY, bytesToBase64(rHash));
+            }
+
             localStorage.removeItem(LEGACY_PASSWORD_KEY);
         }
 
@@ -367,22 +550,38 @@
                 for (let i = 0; i < hash.length; i++) diff |= hash[i] ^ expected[i];
                 return diff === 0;
             }
-
-            // Migração única para instalações da V1.0 que ainda possuem
-            // pixSenha em texto simples. Após autenticar, a senha é convertida.
             const legacy = localStorage.getItem(LEGACY_PASSWORD_KEY);
             if (legacy !== null && password === legacy) {
-                await savePassword(password);
+                // Migração: senha antiga em texto simples
+                await savePassword(password, null);
                 return true;
             }
             return false;
+        }
+
+        async function verifyRecoveryCode(code) {
+            const hashSaved = localStorage.getItem(RECOVERY_HASH_KEY);
+            const saltSaved = localStorage.getItem(RECOVERY_SALT_KEY);
+            if (!hashSaved || !saltSaved) return false;
+            const normalized = normalizarCodigo(code);
+            if (!normalized) return false;
+            const hash = await hashPassword(normalized, base64ToBytes(saltSaved));
+            const expected = base64ToBytes(hashSaved);
+            if (hash.length !== expected.length) return false;
+            let diff = 0;
+            for (let i = 0; i < hash.length; i++) diff |= hash[i] ^ expected[i];
+            return diff === 0;
         }
 
         function hasPassword() {
             return !!(localStorage.getItem(PASSWORD_HASH_KEY) && localStorage.getItem(PASSWORD_SALT_KEY))
                 || localStorage.getItem(LEGACY_PASSWORD_KEY) !== null;
         }
+        function hasRecoveryCode() {
+            return !!(localStorage.getItem(RECOVERY_HASH_KEY) && localStorage.getItem(RECOVERY_SALT_KEY));
+        }
 
+        // ===== FLUXO DE ACESSO =====
         async function abrirGerenciar() {
             if (!hasPassword()) {
                 $('modalCriarSenha').classList.add('active');
@@ -396,6 +595,8 @@
             }
         }
 
+        let acaoAposFecharRecuperacao = null;
+
         async function criarSenha() {
             const senha = $('novaSenha').value.trim();
             const confirma = $('confirmaSenha').value.trim();
@@ -405,9 +606,11 @@
                 return;
             }
             try {
-                await savePassword(senha);
+                const codigo = gerarCodigoRecuperacao();
+                await savePassword(senha, codigo);
                 fecharModalCriarSenha();
-                abrirModalGerenciar();
+                acaoAposFecharRecuperacao = () => abrirModalGerenciar();
+                mostrarCodigoRecuperacao(codigo);
             } catch (e) {
                 alert('Não foi possível proteger a senha neste dispositivo. Tente novamente.');
             }
@@ -433,7 +636,7 @@
         function fecharModalCriarSenha() { $('modalCriarSenha').classList.remove('active'); }
         function fecharModalEntrarSenha() { $('modalEntrarSenha').classList.remove('active'); }
 
-        // ALTERAR SENHA
+        // ===== ALTERAR SENHA =====
         function abrirAlterarSenha() {
             if (!hasPassword()) {
                 alert('Nenhuma senha cadastrada. Crie uma senha primeiro.');
@@ -445,7 +648,6 @@
             $('confirmaSenhaAlterar').value = '';
             document.getElementById('erroAlterar').classList.remove('visible');
         }
-
         function fecharModalAlterarSenha() { $('modalAlterarSenha').classList.remove('active'); }
 
         async function alterarSenha() {
@@ -462,16 +664,208 @@
                 document.getElementById('erroAlterar').classList.add('visible');
                 return;
             }
-            await savePassword(nova);
+            const codigo = gerarCodigoRecuperacao();
+            await savePassword(nova, codigo);
             fecharModalAlterarSenha();
-            alert('✅ Senha alterada com sucesso!');
+            // Gerenciar já está aberto por baixo; não precisa de callback
+            mostrarCodigoRecuperacao(codigo);
         }
 
-        // TUTORIAL
+        // ===== RECUPERAÇÃO DE SENHA =====
+        function abrirRecuperarSenha() {
+            fecharModalEntrarSenha();
+            $('modalRecuperarSenha').classList.add('active');
+            document.getElementById('erroRecuperacao').classList.remove('visible');
+            $('codigoRecuperacao').value = '';
+
+            if (hasRecoveryCode()) {
+                $('secaoRecoveryCode').style.display = 'block';
+                $('secaoSemCodigo').style.display = 'none';
+            } else {
+                $('secaoRecoveryCode').style.display = 'none';
+                $('secaoSemCodigo').style.display = 'block';
+            }
+        }
+        function fecharModalRecuperarSenha() { $('modalRecuperarSenha').classList.remove('active'); }
+
+        async function verificarCodigoRecuperacao() {
+            const code = $('codigoRecuperacao').value.trim();
+            if (!code) {
+                document.getElementById('erroRecuperacao').textContent = 'Digite o código de recuperação.';
+                document.getElementById('erroRecuperacao').classList.add('visible');
+                return;
+            }
+            try {
+                if (await verifyRecoveryCode(code)) {
+                    fecharModalRecuperarSenha();
+                    abrirModalNovaSenhaRecuperada();
+                } else {
+                    document.getElementById('erroRecuperacao').textContent = 'Código inválido. Verifique e tente novamente.';
+                    document.getElementById('erroRecuperacao').classList.add('visible');
+                }
+            } catch (e) {
+                document.getElementById('erroRecuperacao').textContent = 'Erro ao verificar. Tente novamente.';
+                document.getElementById('erroRecuperacao').classList.add('visible');
+            }
+        }
+
+        function abrirResetManterDados() {
+            const ok = confirm('⚠️ Redefinir a senha SEM verificar o código de recuperação?\n\nIsso mantém seus dados, mas reduz a proteção: qualquer pessoa com acesso a este aparelho poderá redefinir a senha.\n\nRecomendado apenas se você realmente esqueceu a senha e não tem o código.\n\nContinuar?');
+            if (!ok) return;
+            fecharModalRecuperarSenha();
+            abrirModalNovaSenhaRecuperada();
+        }
+
+        function abrirModalNovaSenhaRecuperada() {
+            $('modalNovaSenhaRecuperada').classList.add('active');
+            $('novaSenhaRecuperada').value = '';
+            $('confirmaSenhaRecuperada').value = '';
+            document.getElementById('erroNovaSenhaRecuperada').classList.remove('visible');
+        }
+        function fecharModalNovaSenhaRecuperada() { $('modalNovaSenhaRecuperada').classList.remove('active'); }
+
+        async function salvarNovaSenhaRecuperada() {
+            const nova = $('novaSenhaRecuperada').value.trim();
+            const confirma = $('confirmaSenhaRecuperada').value.trim();
+            if (!nova || nova.length < 6 || nova !== confirma) {
+                document.getElementById('erroNovaSenhaRecuperada').textContent = 'A senha deve ter pelo menos 6 caracteres e coincidir com a confirmação.';
+                document.getElementById('erroNovaSenhaRecuperada').classList.add('visible');
+                return;
+            }
+            const codigo = gerarCodigoRecuperacao();
+            await savePassword(nova, codigo);
+            fecharModalNovaSenhaRecuperada();
+            acaoAposFecharRecuperacao = () => abrirModalGerenciar();
+            mostrarCodigoRecuperacao(codigo);
+        }
+
+        // ===== MOSTRAR CÓDIGO DE RECUPERAÇÃO =====
+        function mostrarCodigoRecuperacao(codigo) {
+            $('codigoRecuperacaoDisplay').textContent = codigo;
+            $('modalMostrarRecuperacao').classList.add('active');
+        }
+        function fecharModalMostrarRecuperacao() {
+            $('modalMostrarRecuperacao').classList.remove('active');
+            if (acaoAposFecharRecuperacao) {
+                const cb = acaoAposFecharRecuperacao;
+                acaoAposFecharRecuperacao = null;
+                cb();
+            }
+        }
+        async function copiarCodigoRecuperacao() {
+            const code = $('codigoRecuperacaoDisplay').textContent;
+            try {
+                await navigator.clipboard.writeText(code);
+                alert('Código copiado! Guarde em local seguro.');
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                alert('Código copiado! Guarde em local seguro.');
+            }
+        }
+        function baixarCodigoRecuperacao() {
+            const code = $('codigoRecuperacaoDisplay').textContent;
+            const texto = 'CÓDIGO DE RECUPERAÇÃO — PIX RECEBIMENTOS\n\n' + code
+                + '\n\nGuarde este arquivo em local seguro.\nVocê precisará deste código se esquecer sua senha.\n\nGerado em: '
+                + new Date().toLocaleString('pt-BR') + '\n';
+            const blob = new Blob([texto], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'codigo-recuperacao-pix.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ===== RESET TOTAL =====
+        function abrirResetTudo() {
+            fecharModalRecuperarSenha();
+            $('modalConfirmarReset').classList.add('active');
+            $('confirmacaoReset').value = '';
+            document.getElementById('erroReset').classList.remove('visible');
+        }
+        function fecharModalConfirmarReset() { $('modalConfirmarReset').classList.remove('active'); }
+
+        function executarResetTotal() {
+            const confirmacao = $('confirmacaoReset').value.trim().toUpperCase();
+            if (confirmacao !== 'APAGAR') {
+                document.getElementById('erroReset').textContent = 'Digite APAGAR para confirmar.';
+                document.getElementById('erroReset').classList.add('visible');
+                return;
+            }
+            localStorage.removeItem(PASSWORD_HASH_KEY);
+            localStorage.removeItem(PASSWORD_SALT_KEY);
+            localStorage.removeItem(RECOVERY_HASH_KEY);
+            localStorage.removeItem(RECOVERY_SALT_KEY);
+            localStorage.removeItem(LEGACY_PASSWORD_KEY);
+            localStorage.removeItem('pixConfig');
+            localStorage.removeItem('pixRecebimentos');
+            fecharModalConfirmarReset();
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            alert('✅ Todos os dados foram apagados. Você pode começar do zero.');
+            iniciar();
+        }
+
+        // ===== TUTORIAL =====
         function abrirTutorial() { $('modalTutorial').classList.add('active'); }
         function fecharTutorial() { $('modalTutorial').classList.remove('active'); }
 
-        // UTILITÁRIOS
+        // ===== TIPO DE CHAVE =====
+        let tipoChaveAtual = 'telefone';
+        function selecionarTipoChave(tipo) {
+            tipoChaveAtual = tipo;
+            document.querySelectorAll('.tipo-opcao').forEach(b => b.classList.toggle('active', b.dataset.tipo === tipo));
+            const prefixo = document.getElementById('prefixoChave');
+            const input = document.getElementById('novaChaveInput');
+            if (tipo === 'telefone') {
+                prefixo.classList.remove('oculto');
+                input.placeholder = 'DDD + número (ex.: 31999991234)';
+                input.maxLength = 20;
+                input.setAttribute('inputmode', 'tel');
+            } else {
+                prefixo.classList.add('oculto');
+                if (tipo === 'email') {
+                    input.placeholder = 'exemplo@email.com';
+                    input.maxLength = 77;
+                    input.setAttribute('inputmode', 'email');
+                } else if (tipo === 'cpf') {
+                    input.placeholder = 'Somente números (CPF/CNPJ)';
+                    input.maxLength = 20;
+                    input.setAttribute('inputmode', 'numeric');
+                } else {
+                    input.placeholder = 'Chave aleatória (EVP)';
+                    input.maxLength = 77;
+                    input.setAttribute('inputmode', 'text');
+                }
+            }
+            input.value = '';
+            document.getElementById('statusChaves').textContent = '';
+        }
+
+        // ===== CONTROLE DO BOTÃO SALVAR =====
+        function marcarAlteracao() {
+            const btn = document.getElementById('btnSalvarConfig');
+            if (btn) btn.disabled = false;
+        }
+        function resetarEstadoSalvar() {
+            const btn = document.getElementById('btnSalvarConfig');
+            if (btn) btn.disabled = true;
+        }
+        function setupSaveListeners() {
+            ['modalHeader', 'modalNome', 'modalCidade', 'modalTxid', 'modalDescricao'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el._saveListenerAdded) {
+                    el.addEventListener('input', marcarAlteracao);
+                    el._saveListenerAdded = true;
+                }
+            });
+        }
+
+        // ===== UTILITÁRIOS =====
         function limparTexto(s, max) {
             return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9 .\\-]/g,'').toUpperCase().trim().slice(0,max);
         }
@@ -555,7 +949,7 @@
             return semCRC + crc16(semCRC);
         }
 
-        // GERENCIAMENTO DE DADOS
+        // ===== GERENCIAMENTO DE DADOS =====
         function getConfig() {
             try {
                 const raw = localStorage.getItem('pixConfig');
@@ -564,21 +958,10 @@
                     if (config.chaves && config.chaves.length > 0) return config;
                 }
             } catch(e) {}
-            return {
-                nome: '',
-                cidade: '',
-                txid: '***',
-                descricao: '',
-                header: 'PIX Recebimentos',
-                chaves: [],
-                chaveAtiva: null
-            };
+            return { nome: '', cidade: '', txid: '***', descricao: '', header: 'PIX Recebimentos', chaves: [], chaveAtiva: null };
         }
-        function saveConfig(config) {
-            localStorage.setItem('pixConfig', JSON.stringify(config));
-        }
+        function saveConfig(config) { localStorage.setItem('pixConfig', JSON.stringify(config)); }
 
-        // ATUALIZAR INTERFACE
         function atualizarResumo() {
             const config = getConfig();
             const div = document.getElementById('resumoRecebedor');
@@ -590,7 +973,7 @@
                     <div class="resumo">
                         <div class="info">
                             <strong>Recebedor:</strong> ${config.nome}<br>
-                            <strong>Chave:</strong> 
+                            <strong>Chave:</strong>
                             <span class="chave-mascarada" title="${chaveStr}">${chaveMasc}</span><br>
                             <strong>Cidade:</strong> ${config.cidade}
                             ${config.txid && config.txid !== '***' ? `<br><strong>TXID:</strong> ${config.txid}` : ''}
@@ -607,8 +990,6 @@
                 `;
             }
         }
-
-        // ATUALIZAR CABEÇALHO (CORRIGIDO)
         function atualizarCabecalho(titulo) {
             const elemento = document.getElementById('tituloCabecalho');
             if (!elemento) return;
@@ -616,7 +997,7 @@
             elemento.textContent = tituloFinal;
         }
 
-        // MODAL GERENCIAR
+        // ===== MODAL GERENCIAR =====
         function abrirModalGerenciar() {
             const config = getConfig();
             $('modalHeader').value = config.header || 'PIX Recebimentos';
@@ -625,10 +1006,21 @@
             $('modalTxid').value = config.txid || '***';
             $('modalDescricao').value = config.descricao || '';
             renderizarListaChaves(config);
+
+            tipoChaveAtual = 'telefone';
+            document.querySelectorAll('.tipo-opcao').forEach(b => b.classList.toggle('active', b.dataset.tipo === 'telefone'));
+            const prefixo = document.getElementById('prefixoChave');
+            const input = document.getElementById('novaChaveInput');
+            prefixo.classList.remove('oculto');
+            input.placeholder = 'DDD + número (ex.: 31999991234)';
+            input.maxLength = 20;
+            input.setAttribute('inputmode', 'tel');
+            input.value = '';
+
+            resetarEstadoSalvar();
             $('modalGerenciar').classList.add('active');
             $('geralStatus').textContent = '';
             $('statusChaves').textContent = '';
-            $('novaChaveInput').value = '';
         }
         function fecharModalGerenciar() { $('modalGerenciar').classList.remove('active'); }
 
@@ -645,7 +1037,7 @@
                 html += `
                     <div class="item-chave">
                         <span class="selecionar ${isAtiva ? 'ativa' : ''}" onclick="selecionarChave(${c.id})" title="Tornar ativa">
-                            ${isAtiva ? '⏺' : '○'}
+                            <i class="${isAtiva ? 'fas fa-check-circle' : 'far fa-circle'}"></i>
                         </span>
                         <span class="chave-texto" title="${c.chave}">${chaveMasc}</span>
                         <div class="acoes-chave">
@@ -665,12 +1057,12 @@
                 saveConfig(config);
                 renderizarListaChaves(config);
                 atualizarResumo();
+                marcarAlteracao();
                 $('statusChaves').textContent = '✓ Chave ativa alterada.';
                 $('statusChaves').style.color = '#0b6b3a';
                 setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
             }
         }
-
         function editarChave(id) {
             const config = getConfig();
             const chave = config.chaves.find(c => c.id === id);
@@ -687,12 +1079,12 @@
                 saveConfig(config);
                 renderizarListaChaves(config);
                 atualizarResumo();
+                marcarAlteracao();
                 $('statusChaves').textContent = '✓ Chave atualizada.';
                 $('statusChaves').style.color = '#0b6b3a';
                 setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
             }
         }
-
         function excluirChave(id) {
             if (!confirm('Remover esta chave PIX?')) return;
             const config = getConfig();
@@ -705,18 +1097,30 @@
             saveConfig(config);
             renderizarListaChaves(config);
             atualizarResumo();
+            marcarAlteracao();
             $('statusChaves').textContent = '✓ Chave removida.';
             $('statusChaves').style.color = '#0b6b3a';
             setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
         }
-
         function adicionarChave() {
             const input = document.getElementById('novaChaveInput');
-            const valor = input.value.trim();
+            let valor = input.value.trim();
             if (!valor) {
                 $('statusChaves').textContent = 'Digite uma chave PIX.';
                 $('statusChaves').style.color = '#a42020';
                 return;
+            }
+            if (tipoChaveAtual === 'telefone') {
+                const digits = valor.replace(/\D/g, '');
+                if (digits.length >= 12 && digits.length <= 13 && digits.startsWith('55')) {
+                    valor = '+' + digits;
+                } else if (digits.length >= 10 && digits.length <= 11) {
+                    valor = '+55' + digits;
+                } else {
+                    $('statusChaves').textContent = 'Telefone inválido. Use DDD + número (10 ou 11 dígitos).';
+                    $('statusChaves').style.color = '#a42020';
+                    return;
+                }
             }
             if (valor.includes(' ')) {
                 $('statusChaves').textContent = 'A chave não pode conter espaços.';
@@ -736,6 +1140,7 @@
             renderizarListaChaves(config);
             atualizarResumo();
             input.value = '';
+            marcarAlteracao();
             $('statusChaves').textContent = '✓ Chave adicionada!';
             $('statusChaves').style.color = '#0b6b3a';
             setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
@@ -764,31 +1169,27 @@
             saveConfig(config);
             atualizarResumo();
             atualizarCabecalho(config.header);
+            resetarEstadoSalvar();
             $('geralStatus').textContent = '✓ Configurações salvas!';
             $('geralStatus').style.color = '#0b6b3a';
             setTimeout(() => { $('geralStatus').textContent = ''; }, 3000);
         }
 
-        // RELATÓRIOS
+        // ===== RELATÓRIOS =====
         function abrirModalRelatorios() {
             const lista = getRecebimentos();
             renderizarLista(lista);
             $('modalRelatorios').classList.add('active');
         }
-        function fecharModalRelatorios() {
-            $('modalRelatorios').classList.remove('active');
-        }
+        function fecharModalRelatorios() { $('modalRelatorios').classList.remove('active'); }
         document.getElementById('modalRelatorios').addEventListener('click', function(e) {
             if (e.target === this) fecharModalRelatorios();
         });
 
-        // RECEBIMENTOS
         function getRecebimentos() {
             try { return JSON.parse(localStorage.getItem('pixRecebimentos') || '[]'); } catch (e) { return []; }
         }
-        function salvarRecebimentos(lista) {
-            localStorage.setItem('pixRecebimentos', JSON.stringify(lista));
-        }
+        function salvarRecebimentos(lista) { localStorage.setItem('pixRecebimentos', JSON.stringify(lista)); }
         function adicionarRecebimento(valor, descricao, txid, chave) {
             const now = new Date();
             const dataStr = now.toISOString().slice(0, 10);
@@ -816,7 +1217,6 @@
             salvarRecebimentos(lista);
             renderizarLista(lista);
         }
-
         function renderizarLista(lista) {
             const container = document.getElementById('listaRecebimentos');
             if (!lista || lista.length === 0) {
@@ -850,7 +1250,6 @@
             const totalHTML = `<div class="total">Total recebido (pagos): R$ ${total.toFixed(2).replace('.', ',')} &nbsp;|&nbsp; ${pagoCount} pagos de ${lista.length}</div>`;
             container.innerHTML = html + totalHTML;
         }
-
         function filtrarPorDia() {
             const data = document.getElementById('filtroData').value;
             if (!data) { alert('Selecione uma data.'); return; }
@@ -875,7 +1274,7 @@
             renderizarLista(lista);
         }
 
-        // GERAR QR CODE
+        // ===== GERAR QR CODE =====
         function gerarPix() {
             const config = getConfig();
             if (!config.nome || !config.cidade) {
@@ -915,40 +1314,23 @@
             adicionarRecebimento(valor, descricao, txid, chave);
             $('payload').textContent = payload;
             $('valorExibido').textContent = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            
-            // Limpa o QR Code
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
-            
             if (typeof QRCode === 'undefined') {
                 $('recebStatus').textContent = 'Biblioteca QR Code não carregada.';
                 $('recebStatus').style.color = '#a42020';
                 return;
             }
-            
-            // Gera o QR Code
-            new QRCode(qrContainer, { 
-                text: payload, 
-                width: 260, 
-                height: 260, 
-                correctLevel: QRCode.CorrectLevel.M 
-            });
-            
-            // Exibe o wrapper do QR Code (que contém o ícone)
+            new QRCode(qrContainer, { text: payload, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M });
             document.getElementById('qrcode-wrapper').style.display = 'inline-block';
             document.getElementById('resultado').style.display = 'block';
             $('recebStatus').textContent = '✓ QR Code gerado. Recebimento pendente.';
             $('recebStatus').style.color = '#0b6b3a';
-            
             const resultadoEl = document.getElementById('resultado');
-            setTimeout(() => {
-                resultadoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 200);
-            
+            setTimeout(() => { resultadoEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
             $('valor').value = '';
         }
 
-        // COPIAR E COMPARTILHAR
         async function copiarPix() {
             const texto = $('payload').textContent;
             if (!texto) return;
@@ -968,16 +1350,15 @@
         async function compartilharPix() {
             const texto = $('payload').textContent;
             if (!texto) return;
-            const mensagem = texto;
             if (navigator.share) {
-                try { await navigator.share({ title: 'Pagamento PIX', text: mensagem }); } catch (e) {}
+                try { await navigator.share({ title: 'Pagamento PIX', text: texto }); } catch (e) {}
             } else {
                 try {
-                    await navigator.clipboard.writeText(mensagem);
+                    await navigator.clipboard.writeText(texto);
                     alert('Código PIX copiado! Cole e envie.');
                 } catch (e) {
                     const ta = document.createElement('textarea');
-                    ta.value = mensagem;
+                    ta.value = texto;
                     document.body.appendChild(ta);
                     ta.select();
                     document.execCommand('copy');
@@ -987,11 +1368,9 @@
             }
         }
 
-        // INICIALIZAÇÃO
+        // ===== INICIALIZAÇÃO =====
         function iniciar() {
-            // Esconde o wrapper do QR Code inicialmente
             document.getElementById('qrcode-wrapper').style.display = 'none';
-            
             const config = getConfig();
             atualizarCabecalho(config.header || 'PIX Recebimentos');
             atualizarResumo();
@@ -1002,9 +1381,12 @@
             document.getElementById('filtroFim').value = hoje;
             const lista = getRecebimentos();
             renderizarLista(lista);
+            resetarEstadoSalvar();
+            setupSaveListeners();
         }
         iniciar();
 
+        // ===== EXPORTAÇÃO PARA O ESCOPO GLOBAL =====
         window.marcarComoPago = marcarComoPago;
         window.excluirRecebimento = excluirRecebimento;
         window.filtrarPorDia = filtrarPorDia;
@@ -1028,8 +1410,21 @@
         window.fecharModalEntrarSenha = fecharModalEntrarSenha;
         window.abrirTutorial = abrirTutorial;
         window.fecharTutorial = fecharTutorial;
-        // Versão do aplicativo web: 1.1.0
-        window.PIX_APP_VERSION = "1.1.0";
+        window.selecionarTipoChave = selecionarTipoChave;
+        // Recuperação de senha
+        window.abrirRecuperarSenha = abrirRecuperarSenha;
+        window.fecharModalRecuperarSenha = fecharModalRecuperarSenha;
+        window.verificarCodigoRecuperacao = verificarCodigoRecuperacao;
+        window.abrirResetManterDados = abrirResetManterDados;
+        window.abrirResetTudo = abrirResetTudo;
+        window.fecharModalConfirmarReset = fecharModalConfirmarReset;
+        window.executarResetTotal = executarResetTotal;
+        window.fecharModalNovaSenhaRecuperada = fecharModalNovaSenhaRecuperada;
+        window.salvarNovaSenhaRecuperada = salvarNovaSenhaRecuperada;
+        window.fecharModalMostrarRecuperacao = fecharModalMostrarRecuperacao;
+        window.copiarCodigoRecuperacao = copiarCodigoRecuperacao;
+        window.baixarCodigoRecuperacao = baixarCodigoRecuperacao;
+        window.PIX_APP_VERSION = "1.3.0";
     </script>
 </body>
 </html>
