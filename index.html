@@ -116,7 +116,13 @@
         .senha-modal .modal p { color: #68737d; margin: 4px 0 12px; }
         .senha-modal .modal .erro-senha { color: #a42020; font-size: 14px; margin-top: 6px; display: none; }
         .senha-modal .modal .erro-senha.visible { display: block; }
-        .senha-modal .modal input { margin-bottom: 10px; }
+        /* Campo de senha mais alto para facilitar o toque */
+        .senha-modal .modal input {
+            margin-bottom: 10px;
+            padding: 13px 14px;
+            font-size: 15px;
+            min-height: 48px;
+        }
         .senha-modal .modal .btn-group { margin-top: 6px; }
 
         /* Recuperação de senha */
@@ -181,6 +187,21 @@
         .aviso-reset p:last-of-type { margin-bottom: 10px; }
         .aviso-reset.danger-box { background: #fdeaea; border-left-color: #a42020; }
 
+        /* Contato / rodapé */
+        .contato-footer {
+            text-align: center;
+            padding: 10px 16px 30px;
+            color: #68737d;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .contato-footer a {
+            color: #0b6b3a;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .contato-footer a:hover { text-decoration: underline; }
+
         .tutorial .modal { max-width: 500px; }
         .tutorial .modal ul { padding-left: 20px; }
         .tutorial .modal li { margin: 8px 0; }
@@ -244,6 +265,11 @@
             <p class="small">Após o pagamento, vá em "Relatórios" e confirme o recebimento.</p>
         </section>
     </main>
+
+    <footer class="contato-footer">
+        Qualquer dúvida ou sugestão, envie um e-mail para<br>
+        <a href="mailto:lumsdeveloper6@gmail.com">lumsdeveloper6@gmail.com</a>
+    </footer>
 
     <!-- MODAL GERENCIAR -->
     <div class="modal-overlay" id="modalGerenciar">
@@ -456,6 +482,10 @@
                 <li><strong>5. Gerenciar chaves</strong><br>No modo de edição (ícone <strong>✎</strong>), você pode adicionar, editar ou excluir chaves PIX.</li>
                 <li><strong>6. Esqueceu a senha?</strong><br>Na tela de login, clique em <strong>"Esqueci minha senha"</strong>. Você pode usar o código de recuperação ou redefinir mantendo os dados.</li>
             </ul>
+            <p class="small" style="text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #e8edf2;">
+                Qualquer dúvida ou sugestão, envie um e-mail para<br>
+                <a href="mailto:lumsdeveloper6@gmail.com" style="color: #0b6b3a; font-weight: bold; text-decoration: none;">lumsdeveloper6@gmail.com</a>
+            </p>
             <button class="primary" onclick="fecharTutorial()" style="margin-top:12px;">Entendi!</button>
         </div>
     </div>
@@ -510,7 +540,6 @@
             return new Uint8Array(bits);
         }
 
-        // Gera código de recuperação no formato XXXX-XXXX-XXXX-XXXX
         function gerarCodigoRecuperacao() {
             const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -552,7 +581,6 @@
             }
             const legacy = localStorage.getItem(LEGACY_PASSWORD_KEY);
             if (legacy !== null && password === legacy) {
-                // Migração: senha antiga em texto simples
                 await savePassword(password, null);
                 return true;
             }
@@ -581,7 +609,6 @@
             return !!(localStorage.getItem(RECOVERY_HASH_KEY) && localStorage.getItem(RECOVERY_SALT_KEY));
         }
 
-        // ===== FLUXO DE ACESSO =====
         async function abrirGerenciar() {
             if (!hasPassword()) {
                 $('modalCriarSenha').classList.add('active');
@@ -667,7 +694,6 @@
             const codigo = gerarCodigoRecuperacao();
             await savePassword(nova, codigo);
             fecharModalAlterarSenha();
-            // Gerenciar já está aberto por baixo; não precisa de callback
             mostrarCodigoRecuperacao(codigo);
         }
 
@@ -1057,12 +1083,14 @@
                 saveConfig(config);
                 renderizarListaChaves(config);
                 atualizarResumo();
-                marcarAlteracao();
+                // Selecionar a chave ativa NÃO é uma alteração que exige "Salvar tudo",
+                // pois já é persistida imediatamente em saveConfig().
                 $('statusChaves').textContent = '✓ Chave ativa alterada.';
                 $('statusChaves').style.color = '#0b6b3a';
                 setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
             }
         }
+
         function editarChave(id) {
             const config = getConfig();
             const chave = config.chaves.find(c => c.id === id);
@@ -1411,7 +1439,6 @@
         window.abrirTutorial = abrirTutorial;
         window.fecharTutorial = fecharTutorial;
         window.selecionarTipoChave = selecionarTipoChave;
-        // Recuperação de senha
         window.abrirRecuperarSenha = abrirRecuperarSenha;
         window.fecharModalRecuperarSenha = fecharModalRecuperarSenha;
         window.verificarCodigoRecuperacao = verificarCodigoRecuperacao;
@@ -1424,7 +1451,7 @@
         window.fecharModalMostrarRecuperacao = fecharModalMostrarRecuperacao;
         window.copiarCodigoRecuperacao = copiarCodigoRecuperacao;
         window.baixarCodigoRecuperacao = baixarCodigoRecuperacao;
-        window.PIX_APP_VERSION = "1.3.0";
+        window.PIX_APP_VERSION = "1.3.1";
     </script>
 </body>
 </html>
