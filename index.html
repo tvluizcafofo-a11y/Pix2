@@ -11,7 +11,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== ESTILOS ===== */
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f5f7; color: #17202a; }
         header { background: #0b6b3a; color: #fff; padding: 16px 16px 14px; text-align: center; position: relative; }
@@ -116,91 +115,31 @@
         .senha-modal .modal p { color: #68737d; margin: 4px 0 12px; }
         .senha-modal .modal .erro-senha { color: #a42020; font-size: 14px; margin-top: 6px; display: none; }
         .senha-modal .modal .erro-senha.visible { display: block; }
-        /* Campo de senha mais alto para facilitar o toque */
-        .senha-modal .modal input {
-            margin-bottom: 10px;
-            padding: 13px 14px;
-            font-size: 15px;
-            min-height: 48px;
-        }
+        .senha-modal .modal input { margin-bottom: 10px; padding: 13px 14px; font-size: 15px; min-height: 48px; }
         .senha-modal .modal .btn-group { margin-top: 6px; }
 
-        /* Recuperação de senha */
-        .link-esqueci {
-            display: block;
-            width: 100%;
-            margin-top: 10px;
-            padding: 8px;
-            background: none;
-            border: none;
-            color: #0b6b3a;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
+        .link-esqueci { display: block; width: 100%; margin-top: 10px; padding: 8px; background: none; border: none; color: #0b6b3a; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: underline; text-underline-offset: 3px; }
         .link-esqueci:hover { color: #095a31; }
 
-        .codigo-recuperacao-display {
-            background: #f4f6f8;
-            border: 2px dashed #0b6b3a;
-            border-radius: 12px;
-            padding: 20px 12px;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            color: #0b6b3a;
-            margin: 16px 0;
-            user-select: all;
-            word-break: break-all;
-        }
+        .codigo-recuperacao-display { background: #f4f6f8; border: 2px dashed #0b6b3a; border-radius: 12px; padding: 20px 12px; text-align: center; font-family: 'Courier New', monospace; font-size: 20px; font-weight: bold; letter-spacing: 3px; color: #0b6b3a; margin: 16px 0; user-select: all; word-break: break-all; }
 
-        .divisor-recuperacao {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 18px 0 14px;
-            color: #68737d;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .divisor-recuperacao::before,
-        .divisor-recuperacao::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #cbd2d9;
-        }
+        .divisor-recuperacao { display: flex; align-items: center; text-align: center; margin: 18px 0 14px; color: #68737d; font-size: 12px; font-weight: bold; }
+        .divisor-recuperacao::before, .divisor-recuperacao::after { content: ''; flex: 1; border-bottom: 1px solid #cbd2d9; }
         .divisor-recuperacao span { padding: 0 12px; }
 
-        .aviso-reset {
-            background: #fef6e0;
-            border-left: 4px solid #f1b04a;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
+        .aviso-reset { background: #fef6e0; border-left: 4px solid #f1b04a; padding: 12px 14px; border-radius: 8px; margin-bottom: 10px; }
         .aviso-reset p { margin: 0 0 6px; }
         .aviso-reset p:last-of-type { margin-bottom: 10px; }
         .aviso-reset.danger-box { background: #fdeaea; border-left-color: #a42020; }
 
-        /* Contato / rodapé */
-        .contato-footer {
-            text-align: center;
-            padding: 10px 16px 30px;
-            color: #68737d;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-        .contato-footer a {
-            color: #0b6b3a;
-            font-weight: bold;
-            text-decoration: none;
-        }
+        .contato-footer { text-align: center; padding: 10px 16px 30px; color: #68737d; font-size: 13px; line-height: 1.6; }
+        .contato-footer a { color: #0b6b3a; font-weight: bold; text-decoration: none; }
         .contato-footer a:hover { text-decoration: underline; }
+
+        /* Feedback inline de cópia/compartilhamento */
+        .copy-feedback { min-height: 22px; margin-top: 12px; text-align: center; font-weight: bold; font-size: 14px; transition: opacity 0.2s; }
+        .copy-feedback.success { color: #0b6b3a; }
+        .copy-feedback.error { color: #a42020; }
 
         .tutorial .modal { max-width: 500px; }
         .tutorial .modal ul { padding-left: 20px; }
@@ -260,8 +199,7 @@
             <p><b>Aponte a câmera do celular para o QR Code</b></p>
             <button class="secondary" onclick="copiarPix()">📋 Copiar PIX Copia e Cola</button>
             <button class="secondary" onclick="compartilharPix()">📤 Compartilhar código PIX</button>
-            <h3>PIX Copia e Cola</h3>
-            <div id="payload" class="copybox"></div>
+            <div id="copyFeedback" class="copy-feedback" role="status" aria-live="polite"></div>
             <p class="small">Após o pagamento, vá em "Relatórios" e confirme o recebimento.</p>
         </section>
     </main>
@@ -511,6 +449,9 @@
     <script>
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
+
+        // ===== PAYLOAD EM MEMÓRIA (não exibido na tela) =====
+        let payloadAtual = '';
 
         // ===== CONSTANTES DE SENHA =====
         const PASSWORD_HASH_KEY = 'pixSenhaHash';
@@ -1083,8 +1024,7 @@
                 saveConfig(config);
                 renderizarListaChaves(config);
                 atualizarResumo();
-                // Selecionar a chave ativa NÃO é uma alteração que exige "Salvar tudo",
-                // pois já é persistida imediatamente em saveConfig().
+                // Selecionar chave ativa NÃO exige "Salvar tudo" (já persistiu acima).
                 $('statusChaves').textContent = '✓ Chave ativa alterada.';
                 $('statusChaves').style.color = '#0b6b3a';
                 setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
@@ -1339,9 +1279,14 @@
             }
             const txid = config.txid || '***';
             const payload = gerarPayload(config, chave, valor, descricao);
+
+            // Guarda o payload APENAS em memória — não exibe na tela
+            payloadAtual = payload;
+            limparFeedbackCopia();
+
             adicionarRecebimento(valor, descricao, txid, chave);
-            $('payload').textContent = payload;
             $('valorExibido').textContent = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
             if (typeof QRCode === 'undefined') {
@@ -1359,41 +1304,82 @@
             $('valor').value = '';
         }
 
-        async function copiarPix() {
-            const texto = $('payload').textContent;
-            if (!texto) return;
+        // ===== FEEDBACK INLINE =====
+        function mostrarFeedbackCopia(mensagem, tipo) {
+            const el = $('copyFeedback');
+            if (!el) return;
+            el.textContent = mensagem;
+            el.classList.remove('success', 'error');
+            el.classList.add(tipo === 'error' ? 'error' : 'success');
+            clearTimeout(el._timer);
+            el._timer = setTimeout(() => {
+                el.textContent = '';
+                el.classList.remove('success', 'error');
+            }, 3000);
+        }
+        function limparFeedbackCopia() {
+            const el = $('copyFeedback');
+            if (!el) return;
+            el.textContent = '';
+            el.classList.remove('success', 'error');
+            clearTimeout(el._timer);
+        }
+
+        // Copia usando execCommand (evita aviso nativo do navegador com a origem).
+        function copiarParaAreaDeTransferencia(texto) {
+            const ta = document.createElement('textarea');
+            ta.value = texto;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '0';
+            ta.style.left = '-9999px';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, texto.length);
+            let ok = false;
             try {
-                await navigator.clipboard.writeText(texto);
-                alert('PIX Copia e Cola copiado!');
+                ok = document.execCommand('copy');
             } catch (e) {
-                const ta = document.createElement('textarea');
-                ta.value = texto;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                ta.remove();
-                alert('PIX Copia e Cola copiado!');
+                ok = false;
+            }
+            document.body.removeChild(ta);
+            return ok;
+        }
+
+        async function copiarPix() {
+            if (!payloadAtual) {
+                mostrarFeedbackCopia('Gere um QR Code primeiro.', 'error');
+                return;
+            }
+            // 1) Método legado (não mostra "copiado de [origem]" em muitos navegadores)
+            if (copiarParaAreaDeTransferencia(payloadAtual)) {
+                mostrarFeedbackCopia('✓ Código PIX copiado!', 'success');
+                return;
+            }
+            // 2) Fallback: Clipboard API (pode disparar toast do SO com a origem)
+            try {
+                await navigator.clipboard.writeText(payloadAtual);
+                mostrarFeedbackCopia('✓ Código PIX copiado!', 'success');
+            } catch (e) {
+                mostrarFeedbackCopia('Não foi possível copiar. Tente novamente.', 'error');
             }
         }
+
         async function compartilharPix() {
-            const texto = $('payload').textContent;
-            if (!texto) return;
+            if (!payloadAtual) {
+                mostrarFeedbackCopia('Gere um QR Code primeiro.', 'error');
+                return;
+            }
             if (navigator.share) {
-                try { await navigator.share({ title: 'Pagamento PIX', text: texto }); } catch (e) {}
-            } else {
                 try {
-                    await navigator.clipboard.writeText(texto);
-                    alert('Código PIX copiado! Cole e envie.');
+                    await navigator.share({ title: 'Pagamento PIX', text: payloadAtual });
+                    return;
                 } catch (e) {
-                    const ta = document.createElement('textarea');
-                    ta.value = texto;
-                    document.body.appendChild(ta);
-                    ta.select();
-                    document.execCommand('copy');
-                    ta.remove();
-                    alert('Código PIX copiado! Cole e envie.');
+                    // Usuário cancelou ou falhou — cai para o fallback de cópia
                 }
             }
+            await copiarPix();
         }
 
         // ===== INICIALIZAÇÃO =====
@@ -1411,6 +1397,7 @@
             renderizarLista(lista);
             resetarEstadoSalvar();
             setupSaveListeners();
+            limparFeedbackCopia();
         }
         iniciar();
 
@@ -1451,7 +1438,7 @@
         window.fecharModalMostrarRecuperacao = fecharModalMostrarRecuperacao;
         window.copiarCodigoRecuperacao = copiarCodigoRecuperacao;
         window.baixarCodigoRecuperacao = baixarCodigoRecuperacao;
-        window.PIX_APP_VERSION = "1.3.1";
+        window.PIX_APP_VERSION = "1.3.2";
     </script>
 </body>
 </html>
