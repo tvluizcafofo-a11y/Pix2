@@ -136,7 +136,6 @@
         .contato-footer a { color: #0b6b3a; font-weight: bold; text-decoration: none; }
         .contato-footer a:hover { text-decoration: underline; }
 
-        /* Feedback inline de cópia/compartilhamento */
         .copy-feedback { min-height: 22px; margin-top: 12px; text-align: center; font-weight: bold; font-size: 14px; transition: opacity 0.2s; }
         .copy-feedback.success { color: #0b6b3a; }
         .copy-feedback.error { color: #a42020; }
@@ -207,6 +206,13 @@
     <footer class="contato-footer">
         Qualquer dúvida ou sugestão, envie um e-mail para<br>
         <a href="mailto:lumsdeveloper6@gmail.com">lumsdeveloper6@gmail.com</a>
+        <div style="margin-top: 14px; font-size: 11px; color: #68737d;">
+            Versão <strong id="versaoAtual">…</strong>
+            &nbsp;·&nbsp;
+            <a href="#" onclick="verificarAtualizacao(false); return false;" style="color: #0b6b3a;">Verificar atualização</a>
+            &nbsp;·&nbsp;
+            <a href="#" onclick="forcarRecarregar(); return false;" style="color: #0b6b3a;">Recarregar sem cache</a>
+        </div>
     </footer>
 
     <!-- MODAL GERENCIAR -->
@@ -407,6 +413,43 @@
         </div>
     </div>
 
+    <!-- ===== DIÁLOGOS CUSTOMIZADOS (substituem prompt/confirm/alert nativos) ===== -->
+
+    <!-- PROMPT customizado -->
+    <div class="modal-overlay senha-modal" id="modalPrompt">
+        <div class="modal">
+            <h2 id="promptTitulo">Editar chave PIX</h2>
+            <p id="promptMensagem">Digite o novo valor.</p>
+            <label for="promptInput" id="promptLabel">Valor</label>
+            <input type="text" id="promptInput" maxlength="77" placeholder="Digite aqui">
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharPrompt(null)">Cancelar</button>
+                <button class="primary" onclick="confirmarPrompt()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM customizado -->
+    <div class="modal-overlay senha-modal" id="modalConfirm">
+        <div class="modal">
+            <h2 id="confirmTitulo">Confirmação</h2>
+            <p id="confirmMensagem" style="color: #17202a; font-size: 15px; white-space: pre-line; margin: 8px 0 16px;">Mensagem</p>
+            <div class="btn-group">
+                <button class="secondary" onclick="fecharConfirm(false)">Cancelar</button>
+                <button class="primary" onclick="fecharConfirm(true)">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERT customizado -->
+    <div class="modal-overlay senha-modal" id="modalAlert">
+        <div class="modal">
+            <h2 id="alertTitulo">Aviso</h2>
+            <p id="alertMensagem" style="color: #17202a; font-size: 15px; white-space: pre-line; margin: 8px 0 16px;">Mensagem</p>
+            <button class="primary" onclick="fecharAlerta()" style="width: 100%;">OK</button>
+        </div>
+    </div>
+
     <!-- MODAL TUTORIAL -->
     <div class="modal-overlay tutorial" id="modalTutorial">
         <div class="modal">
@@ -424,6 +467,10 @@
                 Qualquer dúvida ou sugestão, envie um e-mail para<br>
                 <a href="mailto:lumsdeveloper6@gmail.com" style="color: #0b6b3a; font-weight: bold; text-decoration: none;">lumsdeveloper6@gmail.com</a>
             </p>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #e8edf2; text-align: center;">
+                <p class="small" style="margin-bottom: 8px;">Problemas com atualização? Use o botão abaixo:</p>
+                <button class="secondary" onclick="verificarAtualizacao(false)" style="width: 100%;">🔄 Verificar atualização</button>
+            </div>
             <button class="primary" onclick="fecharTutorial()" style="margin-top:12px;">Entendi!</button>
         </div>
     </div>
@@ -450,8 +497,82 @@
         // ===== JAVASCRIPT COMPLETO =====
         const $ = id => document.getElementById(id);
 
-        // ===== PAYLOAD EM MEMÓRIA (não exibido na tela) =====
         let payloadAtual = '';
+
+        // ===== DIÁLOGOS CUSTOMIZADOS =====
+        let promptResolve = null;
+        let confirmResolve = null;
+        let alertResolve = null;
+
+        function mostrarPrompt(titulo, mensagem, valorInicial, label) {
+            return new Promise((resolve) => {
+                promptResolve = resolve;
+                $('promptTitulo').textContent = titulo;
+                $('promptMensagem').textContent = mensagem || '';
+                $('promptLabel').textContent = label || 'Valor';
+                $('promptInput').value = valorInicial || '';
+                $('modalPrompt').classList.add('active');
+                setTimeout(() => $('promptInput').focus(), 100);
+            });
+        }
+        function confirmarPrompt() {
+            const val = $('promptInput').value;
+            $('modalPrompt').classList.remove('active');
+            if (promptResolve) { const r = promptResolve; promptResolve = null; r(val); }
+        }
+        function fecharPrompt(valor) {
+            $('modalPrompt').classList.remove('active');
+            if (promptResolve) { const r = promptResolve; promptResolve = null; r(valor); }
+        }
+
+        function mostrarConfirm(titulo, mensagem) {
+            return new Promise((resolve) => {
+                confirmResolve = resolve;
+                $('confirmTitulo').textContent = titulo;
+                $('confirmMensagem').textContent = mensagem;
+                $('modalConfirm').classList.add('active');
+            });
+        }
+        function fecharConfirm(valor) {
+            $('modalConfirm').classList.remove('active');
+            if (confirmResolve) { const r = confirmResolve; confirmResolve = null; r(valor); }
+        }
+
+        function mostrarAlerta(titulo, mensagem) {
+            return new Promise((resolve) => {
+                alertResolve = resolve;
+                $('alertTitulo').textContent = titulo;
+                $('alertMensagem').textContent = mensagem;
+                $('modalAlert').classList.add('active');
+            });
+        }
+        function fecharAlerta() {
+            $('modalAlert').classList.remove('active');
+            if (alertResolve) { const r = alertResolve; alertResolve = null; r(); }
+        }
+
+        // Enter confirma, Escape cancela
+        document.addEventListener('keydown', function(e) {
+            if ($('modalPrompt').classList.contains('active')) {
+                if (e.key === 'Enter') { e.preventDefault(); confirmarPrompt(); }
+                else if (e.key === 'Escape') { fecharPrompt(null); }
+            } else if ($('modalConfirm').classList.contains('active')) {
+                if (e.key === 'Escape') fecharConfirm(false);
+            } else if ($('modalAlert').classList.contains('active')) {
+                if (e.key === 'Enter' || e.key === 'Escape') fecharAlerta();
+            }
+        });
+
+        // Clique no overlay fecha (cancelar / ok)
+        document.getElementById('modalPrompt').addEventListener('click', function(e) {
+            if (e.target === this) fecharPrompt(null);
+        });
+        document.getElementById('modalConfirm').addEventListener('click', function(e) {
+            if (e.target === this) fecharConfirm(false);
+        });
+        document.getElementById('modalAlert').addEventListener('click', function(e) {
+            if (e.target === this) fecharAlerta();
+        });
 
         // ===== CONSTANTES DE SENHA =====
         const PASSWORD_HASH_KEY = 'pixSenhaHash';
@@ -580,7 +701,7 @@
                 acaoAposFecharRecuperacao = () => abrirModalGerenciar();
                 mostrarCodigoRecuperacao(codigo);
             } catch (e) {
-                alert('Não foi possível proteger a senha neste dispositivo. Tente novamente.');
+                await mostrarAlerta('Erro', 'Não foi possível proteger a senha neste dispositivo. Tente novamente.');
             }
         }
 
@@ -604,10 +725,9 @@
         function fecharModalCriarSenha() { $('modalCriarSenha').classList.remove('active'); }
         function fecharModalEntrarSenha() { $('modalEntrarSenha').classList.remove('active'); }
 
-        // ===== ALTERAR SENHA =====
-        function abrirAlterarSenha() {
+        async function abrirAlterarSenha() {
             if (!hasPassword()) {
-                alert('Nenhuma senha cadastrada. Crie uma senha primeiro.');
+                await mostrarAlerta('Nenhuma senha', 'Nenhuma senha cadastrada. Crie uma senha primeiro.');
                 return;
             }
             $('modalAlterarSenha').classList.add('active');
@@ -638,7 +758,6 @@
             mostrarCodigoRecuperacao(codigo);
         }
 
-        // ===== RECUPERAÇÃO DE SENHA =====
         function abrirRecuperarSenha() {
             fecharModalEntrarSenha();
             $('modalRecuperarSenha').classList.add('active');
@@ -676,8 +795,11 @@
             }
         }
 
-        function abrirResetManterDados() {
-            const ok = confirm('⚠️ Redefinir a senha SEM verificar o código de recuperação?\n\nIsso mantém seus dados, mas reduz a proteção: qualquer pessoa com acesso a este aparelho poderá redefinir a senha.\n\nRecomendado apenas se você realmente esqueceu a senha e não tem o código.\n\nContinuar?');
+        async function abrirResetManterDados() {
+            const ok = await mostrarConfirm(
+                '⚠️ Redefinir senha sem código',
+                'Redefinir a senha SEM verificar o código de recuperação?\n\nIsso mantém seus dados, mas reduz a proteção: qualquer pessoa com acesso a este aparelho poderá redefinir a senha.\n\nRecomendado apenas se você realmente esqueceu a senha e não tem o código.'
+            );
             if (!ok) return;
             fecharModalRecuperarSenha();
             abrirModalNovaSenhaRecuperada();
@@ -706,7 +828,6 @@
             mostrarCodigoRecuperacao(codigo);
         }
 
-        // ===== MOSTRAR CÓDIGO DE RECUPERAÇÃO =====
         function mostrarCodigoRecuperacao(codigo) {
             $('codigoRecuperacaoDisplay').textContent = codigo;
             $('modalMostrarRecuperacao').classList.add('active');
@@ -719,19 +840,36 @@
                 cb();
             }
         }
+
+        // ===== CÓPIA SEM AVISO NATIVO =====
+        function copiarParaAreaDeTransferencia(texto) {
+            const ta = document.createElement('textarea');
+            ta.value = texto;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '0';
+            ta.style.left = '-9999px';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, texto.length);
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+            document.body.removeChild(ta);
+            return ok;
+        }
+
         async function copiarCodigoRecuperacao() {
             const code = $('codigoRecuperacaoDisplay').textContent;
+            if (copiarParaAreaDeTransferencia(code)) {
+                await mostrarAlerta('Código copiado', '✓ Código copiado! Guarde em local seguro.');
+                return;
+            }
             try {
                 await navigator.clipboard.writeText(code);
-                alert('Código copiado! Guarde em local seguro.');
+                await mostrarAlerta('Código copiado', '✓ Código copiado! Guarde em local seguro.');
             } catch (e) {
-                const ta = document.createElement('textarea');
-                ta.value = code;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                ta.remove();
-                alert('Código copiado! Guarde em local seguro.');
+                await mostrarAlerta('Erro', 'Não foi possível copiar. Tente novamente.');
             }
         }
         function baixarCodigoRecuperacao() {
@@ -748,7 +886,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // ===== RESET TOTAL =====
         function abrirResetTudo() {
             fecharModalRecuperarSenha();
             $('modalConfirmarReset').classList.add('active');
@@ -757,7 +894,7 @@
         }
         function fecharModalConfirmarReset() { $('modalConfirmarReset').classList.remove('active'); }
 
-        function executarResetTotal() {
+        async function executarResetTotal() {
             const confirmacao = $('confirmacaoReset').value.trim().toUpperCase();
             if (confirmacao !== 'APAGAR') {
                 document.getElementById('erroReset').textContent = 'Digite APAGAR para confirmar.';
@@ -773,11 +910,10 @@
             localStorage.removeItem('pixRecebimentos');
             fecharModalConfirmarReset();
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-            alert('✅ Todos os dados foram apagados. Você pode começar do zero.');
+            await mostrarAlerta('Dados apagados', '✅ Todos os dados foram apagados. Você pode começar do zero.');
             iniciar();
         }
 
-        // ===== TUTORIAL =====
         function abrirTutorial() { $('modalTutorial').classList.add('active'); }
         function fecharTutorial() { $('modalTutorial').classList.remove('active'); }
 
@@ -813,7 +949,6 @@
             document.getElementById('statusChaves').textContent = '';
         }
 
-        // ===== CONTROLE DO BOTÃO SALVAR =====
         function marcarAlteracao() {
             const btn = document.getElementById('btnSalvarConfig');
             if (btn) btn.disabled = false;
@@ -964,7 +1099,6 @@
             elemento.textContent = tituloFinal;
         }
 
-        // ===== MODAL GERENCIAR =====
         function abrirModalGerenciar() {
             const config = getConfig();
             $('modalHeader').value = config.header || 'PIX Recebimentos';
@@ -1024,37 +1158,44 @@
                 saveConfig(config);
                 renderizarListaChaves(config);
                 atualizarResumo();
-                // Selecionar chave ativa NÃO exige "Salvar tudo" (já persistiu acima).
                 $('statusChaves').textContent = '✓ Chave ativa alterada.';
                 $('statusChaves').style.color = '#0b6b3a';
                 setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
             }
         }
 
-        function editarChave(id) {
+        async function editarChave(id) {
             const config = getConfig();
             const chave = config.chaves.find(c => c.id === id);
             if (!chave) return;
-            const nova = prompt('Editar chave PIX:', chave.chave);
-            if (nova !== null && nova.trim() !== '') {
-                const valor = nova.trim();
-                if (valor.includes(' ')) {
-                    $('statusChaves').textContent = 'A chave não pode conter espaços.';
-                    $('statusChaves').style.color = '#a42020';
-                    return;
-                }
-                chave.chave = valor;
-                saveConfig(config);
-                renderizarListaChaves(config);
-                atualizarResumo();
-                marcarAlteracao();
-                $('statusChaves').textContent = '✓ Chave atualizada.';
-                $('statusChaves').style.color = '#0b6b3a';
-                setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
+            const nova = await mostrarPrompt(
+                'Editar chave PIX',
+                'Digite a nova chave. Não pode conter espaços.',
+                chave.chave,
+                'Chave PIX'
+            );
+            if (nova === null) return;
+            const valor = nova.trim();
+            if (!valor) return;
+            if (valor.includes(' ')) {
+                $('statusChaves').textContent = 'A chave não pode conter espaços.';
+                $('statusChaves').style.color = '#a42020';
+                return;
             }
+            if (valor === chave.chave) return;
+            chave.chave = valor;
+            saveConfig(config);
+            renderizarListaChaves(config);
+            atualizarResumo();
+            marcarAlteracao();
+            $('statusChaves').textContent = '✓ Chave atualizada.';
+            $('statusChaves').style.color = '#0b6b3a';
+            setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
         }
-        function excluirChave(id) {
-            if (!confirm('Remover esta chave PIX?')) return;
+
+        async function excluirChave(id) {
+            const ok = await mostrarConfirm('Remover chave PIX', 'Remover esta chave PIX?\n\nEsta ação não pode ser desfeita.');
+            if (!ok) return;
             const config = getConfig();
             const idx = config.chaves.findIndex(c => c.id === id);
             if (idx === -1) return;
@@ -1070,6 +1211,7 @@
             $('statusChaves').style.color = '#0b6b3a';
             setTimeout(() => { $('statusChaves').textContent = ''; }, 2000);
         }
+
         function adicionarChave() {
             const input = document.getElementById('novaChaveInput');
             let valor = input.value.trim();
@@ -1218,18 +1360,18 @@
             const totalHTML = `<div class="total">Total recebido (pagos): R$ ${total.toFixed(2).replace('.', ',')} &nbsp;|&nbsp; ${pagoCount} pagos de ${lista.length}</div>`;
             container.innerHTML = html + totalHTML;
         }
-        function filtrarPorDia() {
+        async function filtrarPorDia() {
             const data = document.getElementById('filtroData').value;
-            if (!data) { alert('Selecione uma data.'); return; }
+            if (!data) { await mostrarAlerta('Atenção', 'Selecione uma data.'); return; }
             const lista = getRecebimentos();
             const filtrados = lista.filter(item => item.data === data);
             renderizarLista(filtrados);
         }
-        function filtrarPorPeriodo() {
+        async function filtrarPorPeriodo() {
             const inicio = document.getElementById('filtroInicio').value;
             const fim = document.getElementById('filtroFim').value;
-            if (!inicio || !fim) { alert('Selecione as duas datas.'); return; }
-            if (inicio > fim) { alert('Data inicial deve ser <= final.'); return; }
+            if (!inicio || !fim) { await mostrarAlerta('Atenção', 'Selecione as duas datas.'); return; }
+            if (inicio > fim) { await mostrarAlerta('Atenção', 'A data inicial deve ser menor ou igual à data final.'); return; }
             const lista = getRecebimentos();
             const filtrados = lista.filter(item => item.data >= inicio && item.data <= fim);
             renderizarLista(filtrados);
@@ -1280,7 +1422,6 @@
             const txid = config.txid || '***';
             const payload = gerarPayload(config, chave, valor, descricao);
 
-            // Guarda o payload APENAS em memória — não exibe na tela
             payloadAtual = payload;
             limparFeedbackCopia();
 
@@ -1325,39 +1466,15 @@
             clearTimeout(el._timer);
         }
 
-        // Copia usando execCommand (evita aviso nativo do navegador com a origem).
-        function copiarParaAreaDeTransferencia(texto) {
-            const ta = document.createElement('textarea');
-            ta.value = texto;
-            ta.setAttribute('readonly', '');
-            ta.style.position = 'fixed';
-            ta.style.top = '0';
-            ta.style.left = '-9999px';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            ta.setSelectionRange(0, texto.length);
-            let ok = false;
-            try {
-                ok = document.execCommand('copy');
-            } catch (e) {
-                ok = false;
-            }
-            document.body.removeChild(ta);
-            return ok;
-        }
-
         async function copiarPix() {
             if (!payloadAtual) {
                 mostrarFeedbackCopia('Gere um QR Code primeiro.', 'error');
                 return;
             }
-            // 1) Método legado (não mostra "copiado de [origem]" em muitos navegadores)
             if (copiarParaAreaDeTransferencia(payloadAtual)) {
                 mostrarFeedbackCopia('✓ Código PIX copiado!', 'success');
                 return;
             }
-            // 2) Fallback: Clipboard API (pode disparar toast do SO com a origem)
             try {
                 await navigator.clipboard.writeText(payloadAtual);
                 mostrarFeedbackCopia('✓ Código PIX copiado!', 'success');
@@ -1375,12 +1492,53 @@
                 try {
                     await navigator.share({ title: 'Pagamento PIX', text: payloadAtual });
                     return;
-                } catch (e) {
-                    // Usuário cancelou ou falhou — cai para o fallback de cópia
-                }
+                } catch (e) {}
             }
             await copiarPix();
         }
+
+        // ===== VERIFICAÇÃO DE ATUALIZAÇÃO =====
+        async function verificarAtualizacao(silencioso) {
+            try {
+                const url = window.location.pathname + '?_t=' + Date.now();
+                const resp = await fetch(url, { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const html = await resp.text();
+                const match = html.match(/PIX_APP_VERSION\s*=\s*"([^"]+)"/);
+                if (!match) throw new Error('Versão não encontrada no servidor');
+                const versaoServidor = match[1];
+                const versaoLocal = window.PIX_APP_VERSION || '?';
+                if (versaoServidor !== versaoLocal) {
+                    const ok = await mostrarConfirm(
+                        'Nova versão disponível',
+                        'Versão atual: ' + versaoLocal + '\nNova versão: ' + versaoServidor + '\n\nRecarregar agora?'
+                    );
+                    if (ok) forcarRecarregar();
+                } else if (!silencioso) {
+                    await mostrarAlerta('Já atualizado', '✅ Você já está na versão mais recente (' + versaoLocal + ').');
+                }
+            } catch (e) {
+                if (!silencioso) await mostrarAlerta('Falha na verificação', 'Não foi possível verificar atualizações.\n\n' + e.message);
+            }
+        }
+
+        function forcarRecarregar() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('_v', Date.now().toString());
+            window.location.replace(url.toString());
+        }
+
+        (function limparServiceWorkers() {
+            if (!('serviceWorker' in navigator)) return;
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                if (regs.length === 0) return;
+                Promise.all(regs.map(r => r.unregister())).then(() => {
+                    if ('caches' in window) {
+                        caches.keys().then(names => Promise.all(names.map(n => caches.delete(n))));
+                    }
+                });
+            }).catch(() => {});
+        })();
 
         // ===== INICIALIZAÇÃO =====
         function iniciar() {
@@ -1398,6 +1556,9 @@
             resetarEstadoSalvar();
             setupSaveListeners();
             limparFeedbackCopia();
+            const elVersao = document.getElementById('versaoAtual');
+            if (elVersao) elVersao.textContent = window.PIX_APP_VERSION || '';
+            setTimeout(() => verificarAtualizacao(true), 3000);
         }
         iniciar();
 
@@ -1438,7 +1599,13 @@
         window.fecharModalMostrarRecuperacao = fecharModalMostrarRecuperacao;
         window.copiarCodigoRecuperacao = copiarCodigoRecuperacao;
         window.baixarCodigoRecuperacao = baixarCodigoRecuperacao;
-        window.PIX_APP_VERSION = "1.3.2";
+        window.verificarAtualizacao = verificarAtualizacao;
+        window.forcarRecarregar = forcarRecarregar;
+        window.confirmarPrompt = confirmarPrompt;
+        window.fecharPrompt = fecharPrompt;
+        window.fecharConfirm = fecharConfirm;
+        window.fecharAlerta = fecharAlerta;
+        window.PIX_APP_VERSION = "1.3.3";
     </script>
 </body>
 </html>
