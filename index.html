@@ -57,6 +57,8 @@
         .modal .btn-group button { flex: 1; }
         @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
 
+        #modalAlert, #modalConfirm, #modalPrompt { z-index: 1200; }
+
         .lista-chaves { margin: 12px 0; }
         .item-chave { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #e8edf2; background: #fafcff; border-radius: 8px; margin-bottom: 6px; color: #17202a; }
         .item-chave .chave-texto { font-size: 14px; color: #17202a; flex: 1; margin: 0 10px; word-break: break-all; }
@@ -209,7 +211,7 @@
         <div style="margin-top: 14px; font-size: 11px; color: #68737d;">
             Versão <strong id="versaoAtual">…</strong>
             &nbsp;·&nbsp;
-            <a href="#" onclick="verificarAtualizacao(false); return false;" style="color: #0b6b3a;">Verificar atualização</a>
+            <a href="#" onclick="verificarAtualizacao(false, this); return false;" style="color: #0b6b3a;">Verificar atualização</a>
             &nbsp;·&nbsp;
             <a href="#" onclick="forcarRecarregar(); return false;" style="color: #0b6b3a;">Recarregar sem cache</a>
         </div>
@@ -335,18 +337,12 @@
                 <input type="text" id="codigoRecuperacao" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" style="text-transform: uppercase; text-align: center; font-family: 'Courier New', monospace; font-size: 17px; letter-spacing: 2px;">
                 <div class="erro-senha" id="erroRecuperacao">Código inválido. Verifique e tente novamente.</div>
                 <button class="primary" onclick="verificarCodigoRecuperacao()" style="width: 100%;">Verificar código</button>
-                <div class="divisor-recuperacao"><span>OU</span></div>
-            </div>
-
-            <div id="secaoSemCodigo" style="display: none;">
-                <p class="small" style="text-align: center; margin-bottom: 14px;">Nenhum código de recuperação foi cadastrado neste dispositivo (senha antiga).</p>
                 <div class="divisor-recuperacao"><span>OPÇÕES</span></div>
             </div>
 
-            <div class="aviso-reset">
-                <p><strong>🔓 Redefinir só a senha (mantém os dados)</strong></p>
-                <p class="small">Mantém a configuração do recebedor, chaves PIX e histórico. Menos seguro: qualquer pessoa com acesso a este aparelho pode fazer isso.</p>
-                <button class="secondary" onclick="abrirResetManterDados()" style="width: 100%;">Redefinir mantendo os dados</button>
+            <div id="secaoSemCodigo" style="display: none;">
+                <p class="small" style="text-align: center; margin-bottom: 14px;">Nenhum código de recuperação foi cadastrado neste dispositivo.</p>
+                <div class="divisor-recuperacao"><span>OPÇÕES</span></div>
             </div>
 
             <div class="aviso-reset danger-box">
@@ -459,15 +455,15 @@
                 <li><strong>3. Compartilhar</strong><br>Copie o código ou compartilhe via WhatsApp/e-mail. O destinatário cola no app do banco.</li>
                 <li><strong>4. Confirmar pagamento</strong><br>Vá em <strong>"📊 Relatórios"</strong>, localize a cobrança pendente e clique em <strong>"✅ Confirmar"</strong>.</li>
                 <li><strong>5. Gerenciar chaves</strong><br>No modo de edição (ícone <strong>✎</strong>), você pode adicionar, editar ou excluir chaves PIX.</li>
-                <li><strong>6. Esqueceu a senha?</strong><br>Na tela de login, clique em <strong>"Esqueci minha senha"</strong>. Você pode usar o código de recuperação ou redefinir mantendo os dados.</li>
+                <li><strong>6. Esqueceu a senha?</strong><br>Na tela de login, clique em <strong>"Esqueci minha senha"</strong> e use o código de recuperação. Sem o código, será necessário apagar todos os dados.</li>
             </ul>
             <p class="small" style="text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #e8edf2;">
                 Qualquer dúvida ou sugestão, envie um e-mail para<br>
                 <a href="mailto:lumsdeveloper6@gmail.com" style="color: #0b6b3a; font-weight: bold; text-decoration: none;">lumsdeveloper6@gmail.com</a>
             </p>
             <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #e8edf2; text-align: center;">
-                <p class="small" style="margin-bottom: 8px;">Problemas com atualização? Use o botão abaixo:</p>
-                <button class="secondary" onclick="verificarAtualizacao(false)" style="width: 100%;">🔄 Verificar atualização</button>
+                <p class="small" style="margin-bottom: 8px;">Verifica se há uma versão mais recente do app publicada:</p>
+                <button class="secondary" onclick="verificarAtualizacao(false, this)" style="width: 100%;">🔄 Verificar atualização</button>
             </div>
             <button class="primary" onclick="fecharTutorial()" style="margin-top:12px;">Entendi!</button>
         </div>
@@ -791,16 +787,6 @@
             }
         }
 
-        async function abrirResetManterDados() {
-            const ok = await mostrarConfirm(
-                '⚠️ Redefinir senha sem código',
-                'Redefinir a senha SEM verificar o código de recuperação?\n\nIsso mantém seus dados, mas reduz a proteção: qualquer pessoa com acesso a este aparelho poderá redefinir a senha.\n\nRecomendado apenas se você realmente esqueceu a senha e não tem o código.'
-            );
-            if (!ok) return;
-            fecharModalRecuperarSenha();
-            abrirModalNovaSenhaRecuperada();
-        }
-
         function abrirModalNovaSenhaRecuperada() {
             $('modalNovaSenhaRecuperada').classList.add('active');
             $('novaSenhaRecuperada').value = '';
@@ -1115,7 +1101,20 @@
             $('geralStatus').textContent = '';
             $('statusChaves').textContent = '';
         }
-        function fecharModalGerenciar() { $('modalGerenciar').classList.remove('active'); }
+
+        async function fecharModalGerenciar(forceClose) {
+            if (!forceClose) {
+                const btn = document.getElementById('btnSalvarConfig');
+                if (btn && !btn.disabled) {
+                    const ok = await mostrarConfirm(
+                        'Sair sem salvar?',
+                        'Existem alterações não salvas no cadastro.\n\nDeseja realmente sair sem salvar? As alterações serão perdidas.'
+                    );
+                    if (!ok) return;
+                }
+            }
+            $('modalGerenciar').classList.remove('active');
+        }
 
         function renderizarListaChaves(config) {
             const container = document.getElementById('listaChaves');
@@ -1479,19 +1478,19 @@
             }
             if (navigator.share) {
                 try {
-                    // Envia APENAS o texto (payload puro) para não poluir o código PIX.
-                    // Sem 'title' e sem 'url' — alguns apps pré-pendem o título ao texto,
-                    // o que quebra a leitura do PIX Copia e Cola pelo banco.
                     await navigator.share({ text: payloadAtual });
                     return;
-                } catch (e) {
-                    // Usuário cancelou ou share falhou — cai para o fallback de cópia
-                }
+                } catch (e) {}
             }
             await copiarPix();
         }
 
-        async function verificarAtualizacao(silencioso) {
+        async function verificarAtualizacao(silencioso, botao) {
+            const textoOriginal = '🔄 Verificar atualização';
+            if (botao) {
+                botao.disabled = true;
+                botao.textContent = '⏳ Verificando...';
+            }
             try {
                 const url = window.location.pathname + '?_t=' + Date.now();
                 const resp = await fetch(url, { cache: 'no-store' });
@@ -1512,6 +1511,11 @@
                 }
             } catch (e) {
                 if (!silencioso) await mostrarAlerta('Falha na verificação', 'Não foi possível verificar atualizações.\n\n' + e.message);
+            } finally {
+                if (botao) {
+                    botao.disabled = false;
+                    botao.textContent = textoOriginal;
+                }
             }
         }
 
@@ -1581,7 +1585,6 @@
         window.abrirRecuperarSenha = abrirRecuperarSenha;
         window.fecharModalRecuperarSenha = fecharModalRecuperarSenha;
         window.verificarCodigoRecuperacao = verificarCodigoRecuperacao;
-        window.abrirResetManterDados = abrirResetManterDados;
         window.abrirResetTudo = abrirResetTudo;
         window.fecharModalConfirmarReset = fecharModalConfirmarReset;
         window.executarResetTotal = executarResetTotal;
@@ -1596,7 +1599,7 @@
         window.fecharPrompt = fecharPrompt;
         window.fecharConfirm = fecharConfirm;
         window.fecharAlerta = fecharAlerta;
-        window.PIX_APP_VERSION = "1.3.4";
+        window.PIX_APP_VERSION = "1.3.6";
     </script>
 </body>
 </html>
